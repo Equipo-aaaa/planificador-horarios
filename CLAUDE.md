@@ -23,7 +23,7 @@ El código se termina el **martes 17 de noviembre de 2026** en la noche, para la
 | Sprint 2 | dom 15 al mar 17 nov | Flujo completo en la URL pública: buscar, ordenar fichas, generar, editar, copiar NRC y exportar; página de análisis con la gráfica |
 | Cierre | mié 18 al vie 20 nov | Prueba con estudiantes, limpieza, README y deploy final |
 
-Las tareas se identifican con las iniciales del responsable y un número: `DI` Diego, `DA` Daniel, `BR` Brayan, `AN` Andrés y `TO` todos (por ejemplo, `BR-02`). El número sigue el orden de las fechas, así que cada quien avanza en orden numérico. Aun así, una tarea no se empieza hasta que las de su "Depende de" estén en `main`, o se trabaja con los datos de `ejemplos/` mientras tanto.
+Las tareas se identifican con las iniciales del responsable y un número: `DI` Diego, `DA` Daniel, `BR` Brayan, `AN` Andrés y `TO` todos (por ejemplo, `BR-02`). El número sigue el orden de las fechas, así que cada quien avanza en orden numérico. El detalle de cada tarea está en `docs/backlog.md`; al ayudar con una tarea, revisa ahí su Definition of Done y su "Depende de". Una tarea no se empieza hasta que las de su "Depende de" estén en `main`, o se trabaja con los datos de `ejemplos/` mientras tanto.
 
 ## Qué hace la app
 
@@ -60,6 +60,7 @@ Los contratos son acuerdos sobre qué datos se pasan entre partes. Son como el e
 | `docs/modelo-datos.md` | Forma de la oferta, las preferencias, el `Problema`, la `Opcion`, el `ResultadoBusqueda` y lo que se guarda en el navegador |
 | `docs/reglas-horario.md` | Empalme, conflictos, turno, huecos, costo, cómo se comparan opciones, **desempate**, cota optimista, poda y estadísticas |
 | `docs/contrato-modulos.md` | Firma de cada función exportada, API HTTP, contenedores de la página, flujo de integración y demos |
+| `docs/backlog.md` | Las 37 tareas con descripción, responsable, fecha, dependencias y Definition of Done |
 
 Datos de ejemplo verificados con una implementación de referencia: `ejemplos/oferta-ejemplo.json` (4 materias inventadas, 36 combinaciones) y tres escenarios con sus preferencias y su resultado esperado; `escenario-1-todas.json` trae las 36 combinaciones con su puntaje.
 
