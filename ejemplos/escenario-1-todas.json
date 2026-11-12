@@ -1,0 +1,506 @@
+[
+  {
+    "lugar": 1,
+    "nrcs": [
+      "100001",
+      "100012",
+      "100021",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 1,
+    "minutosFuera": 0,
+    "costo": 100,
+    "huecos": 260
+  },
+  {
+    "lugar": 2,
+    "nrcs": [
+      "100001",
+      "100012",
+      "100021",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 2,
+    "minutosFuera": 0,
+    "costo": 200,
+    "huecos": 10
+  },
+  {
+    "lugar": 3,
+    "nrcs": [
+      "100001",
+      "100012",
+      "100022",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 2,
+    "minutosFuera": 0,
+    "costo": 200,
+    "huecos": 20
+  },
+  {
+    "lugar": 4,
+    "nrcs": [
+      "100002",
+      "100011",
+      "100022",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 2,
+    "minutosFuera": 0,
+    "costo": 200,
+    "huecos": 20
+  },
+  {
+    "lugar": 5,
+    "nrcs": [
+      "100001",
+      "100012",
+      "100022",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 0,
+    "costo": 300,
+    "huecos": 10
+  },
+  {
+    "lugar": 6,
+    "nrcs": [
+      "100002",
+      "100011",
+      "100022",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 0,
+    "costo": 300,
+    "huecos": 10
+  },
+  {
+    "lugar": 7,
+    "nrcs": [
+      "100002",
+      "100012",
+      "100022",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 0,
+    "costo": 300,
+    "huecos": 20
+  },
+  {
+    "lugar": 8,
+    "nrcs": [
+      "100002",
+      "100012",
+      "100022",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 0,
+    "costo": 400,
+    "huecos": 10
+  },
+  {
+    "lugar": 9,
+    "nrcs": [
+      "100003",
+      "100011",
+      "100021",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 2,
+    "minutosFuera": 230,
+    "costo": 430,
+    "huecos": 500
+  },
+  {
+    "lugar": 10,
+    "nrcs": [
+      "100003",
+      "100012",
+      "100021",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 230,
+    "costo": 530,
+    "huecos": 260
+  },
+  {
+    "lugar": 11,
+    "nrcs": [
+      "100003",
+      "100011",
+      "100022",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 230,
+    "costo": 530,
+    "huecos": 270
+  },
+  {
+    "lugar": 12,
+    "nrcs": [
+      "100003",
+      "100011",
+      "100021",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 230,
+    "costo": 530,
+    "huecos": 730
+  },
+  {
+    "lugar": 13,
+    "nrcs": [
+      "100001",
+      "100012",
+      "100023",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 230,
+    "costo": 530,
+    "huecos": 740
+  },
+  {
+    "lugar": 14,
+    "nrcs": [
+      "100002",
+      "100011",
+      "100023",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 3,
+    "minutosFuera": 230,
+    "costo": 530,
+    "huecos": 740
+  },
+  {
+    "lugar": 15,
+    "nrcs": [
+      "100003",
+      "100012",
+      "100021",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 230,
+    "costo": 630,
+    "huecos": 10
+  },
+  {
+    "lugar": 16,
+    "nrcs": [
+      "100003",
+      "100012",
+      "100022",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 230,
+    "costo": 630,
+    "huecos": 260
+  },
+  {
+    "lugar": 17,
+    "nrcs": [
+      "100002",
+      "100012",
+      "100023",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 230,
+    "costo": 630,
+    "huecos": 380
+  },
+  {
+    "lugar": 18,
+    "nrcs": [
+      "100001",
+      "100012",
+      "100023",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 230,
+    "costo": 630,
+    "huecos": 490
+  },
+  {
+    "lugar": 19,
+    "nrcs": [
+      "100002",
+      "100011",
+      "100023",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 230,
+    "costo": 630,
+    "huecos": 490
+  },
+  {
+    "lugar": 20,
+    "nrcs": [
+      "100003",
+      "100011",
+      "100022",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 230,
+    "costo": 630,
+    "huecos": 500
+  },
+  {
+    "lugar": 21,
+    "nrcs": [
+      "100002",
+      "100012",
+      "100023",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 5,
+    "minutosFuera": 230,
+    "costo": 730,
+    "huecos": 380
+  },
+  {
+    "lugar": 22,
+    "nrcs": [
+      "100003",
+      "100012",
+      "100022",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 5,
+    "minutosFuera": 230,
+    "costo": 730,
+    "huecos": 490
+  },
+  {
+    "lugar": 23,
+    "nrcs": [
+      "100003",
+      "100011",
+      "100023",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 4,
+    "minutosFuera": 460,
+    "costo": 860,
+    "huecos": 500
+  },
+  {
+    "lugar": 24,
+    "nrcs": [
+      "100003",
+      "100011",
+      "100023",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 5,
+    "minutosFuera": 460,
+    "costo": 960,
+    "huecos": 730
+  },
+  {
+    "lugar": 25,
+    "nrcs": [
+      "100003",
+      "100012",
+      "100023",
+      "100032"
+    ],
+    "conflictos": 0,
+    "prioridad": 5,
+    "minutosFuera": 460,
+    "costo": 960,
+    "huecos": 740
+  },
+  {
+    "lugar": 26,
+    "nrcs": [
+      "100003",
+      "100012",
+      "100023",
+      "100031"
+    ],
+    "conflictos": 0,
+    "prioridad": 6,
+    "minutosFuera": 460,
+    "costo": 1060,
+    "huecos": 490
+  },
+  {
+    "lugar": 27,
+    "nrcs": [
+      "100001",
+      "100011",
+      "100021",
+      "100032"
+    ],
+    "conflictos": 2,
+    "prioridad": 0,
+    "minutosFuera": 0,
+    "costo": 0,
+    "huecos": 250
+  },
+  {
+    "lugar": 28,
+    "nrcs": [
+      "100001",
+      "100011",
+      "100021",
+      "100031"
+    ],
+    "conflictos": 2,
+    "prioridad": 1,
+    "minutosFuera": 0,
+    "costo": 100,
+    "huecos": 0
+  },
+  {
+    "lugar": 29,
+    "nrcs": [
+      "100001",
+      "100011",
+      "100022",
+      "100032"
+    ],
+    "conflictos": 2,
+    "prioridad": 1,
+    "minutosFuera": 0,
+    "costo": 100,
+    "huecos": 20
+  },
+  {
+    "lugar": 30,
+    "nrcs": [
+      "100002",
+      "100011",
+      "100021",
+      "100032"
+    ],
+    "conflictos": 2,
+    "prioridad": 1,
+    "minutosFuera": 0,
+    "costo": 100,
+    "huecos": 250
+  },
+  {
+    "lugar": 31,
+    "nrcs": [
+      "100002",
+      "100011",
+      "100021",
+      "100031"
+    ],
+    "conflictos": 2,
+    "prioridad": 2,
+    "minutosFuera": 0,
+    "costo": 200,
+    "huecos": 0
+  },
+  {
+    "lugar": 32,
+    "nrcs": [
+      "100001",
+      "100011",
+      "100022",
+      "100031"
+    ],
+    "conflictos": 2,
+    "prioridad": 2,
+    "minutosFuera": 0,
+    "costo": 200,
+    "huecos": 10
+  },
+  {
+    "lugar": 33,
+    "nrcs": [
+      "100002",
+      "100012",
+      "100021",
+      "100032"
+    ],
+    "conflictos": 2,
+    "prioridad": 2,
+    "minutosFuera": 0,
+    "costo": 200,
+    "huecos": 10
+  },
+  {
+    "lugar": 34,
+    "nrcs": [
+      "100002",
+      "100012",
+      "100021",
+      "100031"
+    ],
+    "conflictos": 2,
+    "prioridad": 3,
+    "minutosFuera": 0,
+    "costo": 300,
+    "huecos": 10
+  },
+  {
+    "lugar": 35,
+    "nrcs": [
+      "100001",
+      "100011",
+      "100023",
+      "100032"
+    ],
+    "conflictos": 2,
+    "prioridad": 2,
+    "minutosFuera": 230,
+    "costo": 430,
+    "huecos": 250
+  },
+  {
+    "lugar": 36,
+    "nrcs": [
+      "100001",
+      "100011",
+      "100023",
+      "100031"
+    ],
+    "conflictos": 2,
+    "prioridad": 3,
+    "minutosFuera": 230,
+    "costo": 530,
+    "huecos": 0
+  }
+]

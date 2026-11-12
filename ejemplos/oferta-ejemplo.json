@@ -1,0 +1,258 @@
+{
+  "ciclo": "202620",
+  "descargada": "2026-11-12T08:00:00.000Z",
+  "fuente": "ejemplo",
+  "materias": [
+    {
+      "clave": "IL355",
+      "nombre": "ANALISIS DE ALGORITMOS",
+      "creditos": 8,
+      "secciones": [
+        {
+          "nrc": "100001",
+          "seccion": "D01",
+          "profesor": "RAMIREZ LOPEZ, ANA",
+          "cupo": 40,
+          "disponibles": 3,
+          "sesiones": [
+            {
+              "dia": 0,
+              "inicio": 420,
+              "fin": 535,
+              "edificio": "DUCT1",
+              "aula": "A001"
+            },
+            {
+              "dia": 2,
+              "inicio": 420,
+              "fin": 535,
+              "edificio": "DUCT1",
+              "aula": "A001"
+            }
+          ]
+        },
+        {
+          "nrc": "100002",
+          "seccion": "D02",
+          "profesor": "GOMEZ RUIZ, JUAN",
+          "cupo": 40,
+          "disponibles": 12,
+          "sesiones": [
+            {
+              "dia": 1,
+              "inicio": 660,
+              "fin": 775,
+              "edificio": "DUCT2",
+              "aula": "B105"
+            },
+            {
+              "dia": 3,
+              "inicio": 660,
+              "fin": 775,
+              "edificio": "DUCT2",
+              "aula": "B105"
+            }
+          ]
+        },
+        {
+          "nrc": "100003",
+          "seccion": "D03",
+          "profesor": "TORRES DIAZ, LUIS",
+          "cupo": 40,
+          "disponibles": 20,
+          "sesiones": [
+            {
+              "dia": 0,
+              "inicio": 900,
+              "fin": 1015,
+              "edificio": "DEDX",
+              "aula": "A010"
+            },
+            {
+              "dia": 2,
+              "inicio": 900,
+              "fin": 1015,
+              "edificio": "DEDX",
+              "aula": "A010"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "clave": "IL356",
+      "nombre": "BASES DE DATOS",
+      "creditos": 8,
+      "secciones": [
+        {
+          "nrc": "100011",
+          "seccion": "D01",
+          "profesor": "HERRERA SOTO, MARIA",
+          "cupo": 35,
+          "disponibles": 1,
+          "sesiones": [
+            {
+              "dia": 0,
+              "inicio": 420,
+              "fin": 535,
+              "edificio": "DUCT1",
+              "aula": "A002"
+            },
+            {
+              "dia": 2,
+              "inicio": 420,
+              "fin": 535,
+              "edificio": "DUCT1",
+              "aula": "A002"
+            }
+          ]
+        },
+        {
+          "nrc": "100012",
+          "seccion": "D02",
+          "profesor": "CASTRO VEGA, PEDRO",
+          "cupo": 35,
+          "disponibles": 9,
+          "sesiones": [
+            {
+              "dia": 1,
+              "inicio": 540,
+              "fin": 655,
+              "edificio": "DUCT1",
+              "aula": "A003"
+            },
+            {
+              "dia": 3,
+              "inicio": 780,
+              "fin": 895,
+              "edificio": "DUCT1",
+              "aula": "LC03"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "clave": "IL357",
+      "nombre": "REDES DE COMPUTADORAS",
+      "creditos": 8,
+      "secciones": [
+        {
+          "nrc": "100021",
+          "seccion": "D01",
+          "profesor": "MORALES NUNEZ, ROSA",
+          "cupo": 30,
+          "disponibles": 5,
+          "sesiones": [
+            {
+              "dia": 1,
+              "inicio": 660,
+              "fin": 775,
+              "edificio": "DUCT2",
+              "aula": "B201"
+            },
+            {
+              "dia": 3,
+              "inicio": 660,
+              "fin": 775,
+              "edificio": "DUCT2",
+              "aula": "B201"
+            }
+          ]
+        },
+        {
+          "nrc": "100022",
+          "seccion": "D02",
+          "profesor": "FLORES PENA, JORGE",
+          "cupo": 30,
+          "disponibles": 14,
+          "sesiones": [
+            {
+              "dia": 0,
+              "inicio": 540,
+              "fin": 655,
+              "edificio": "DUCT2",
+              "aula": "B202"
+            },
+            {
+              "dia": 2,
+              "inicio": 540,
+              "fin": 655,
+              "edificio": "DUCT2",
+              "aula": "B202"
+            }
+          ]
+        },
+        {
+          "nrc": "100023",
+          "seccion": "D03",
+          "profesor": "MORALES NUNEZ, ROSA",
+          "cupo": 30,
+          "disponibles": 25,
+          "sesiones": [
+            {
+              "dia": 1,
+              "inicio": 1020,
+              "fin": 1135,
+              "edificio": "DUCT2",
+              "aula": "B201"
+            },
+            {
+              "dia": 3,
+              "inicio": 1020,
+              "fin": 1135,
+              "edificio": "DUCT2",
+              "aula": "B201"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "clave": "MT201",
+      "nombre": "ECUACIONES DIFERENCIALES",
+      "creditos": 8,
+      "secciones": [
+        {
+          "nrc": "100031",
+          "seccion": "D01",
+          "profesor": "JIMENEZ ORTIZ, CARLOS",
+          "cupo": 45,
+          "disponibles": 30,
+          "sesiones": [
+            {
+              "dia": 4,
+              "inicio": 420,
+              "fin": 655,
+              "edificio": "DEDT",
+              "aula": "T012"
+            }
+          ]
+        },
+        {
+          "nrc": "100032",
+          "seccion": "D02",
+          "profesor": "SALAZAR REYES, LAURA",
+          "cupo": 45,
+          "disponibles": 8,
+          "sesiones": [
+            {
+              "dia": 0,
+              "inicio": 660,
+              "fin": 775,
+              "edificio": "DEDT",
+              "aula": "T014"
+            },
+            {
+              "dia": 2,
+              "inicio": 660,
+              "fin": 775,
+              "edificio": "DEDT",
+              "aula": "T014"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

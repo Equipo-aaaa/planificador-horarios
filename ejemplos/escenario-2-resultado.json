@@ -1,0 +1,111 @@
+{
+  "opciones": [
+    {
+      "secciones": [
+        {
+          "clave": "IL355",
+          "nrc": "100003",
+          "rango": 2
+        },
+        {
+          "clave": "IL356",
+          "nrc": "100011",
+          "rango": 0
+        },
+        {
+          "clave": "IL357",
+          "nrc": "100023",
+          "rango": 2
+        },
+        {
+          "clave": "MT201",
+          "nrc": "100032",
+          "rango": 0
+        }
+      ],
+      "puntaje": {
+        "conflictos": 0,
+        "prioridad": 4,
+        "minutosFuera": 460,
+        "costo": 860,
+        "huecos": 500
+      },
+      "empalmes": []
+    },
+    {
+      "secciones": [
+        {
+          "clave": "IL355",
+          "nrc": "100003",
+          "rango": 2
+        },
+        {
+          "clave": "IL356",
+          "nrc": "100011",
+          "rango": 0
+        },
+        {
+          "clave": "IL357",
+          "nrc": "100021",
+          "rango": 0
+        },
+        {
+          "clave": "MT201",
+          "nrc": "100032",
+          "rango": 0
+        }
+      ],
+      "puntaje": {
+        "conflictos": 0,
+        "prioridad": 2,
+        "minutosFuera": 690,
+        "costo": 890,
+        "huecos": 500
+      },
+      "empalmes": []
+    },
+    {
+      "secciones": [
+        {
+          "clave": "IL355",
+          "nrc": "100003",
+          "rango": 2
+        },
+        {
+          "clave": "IL356",
+          "nrc": "100012",
+          "rango": 1
+        },
+        {
+          "clave": "IL357",
+          "nrc": "100023",
+          "rango": 2
+        },
+        {
+          "clave": "MT201",
+          "nrc": "100032",
+          "rango": 0
+        }
+      ],
+      "puntaje": {
+        "conflictos": 0,
+        "prioridad": 5,
+        "minutosFuera": 460,
+        "costo": 960,
+        "huecos": 740
+      },
+      "empalmes": []
+    }
+  ],
+  "sinOpciones": [],
+  "estadisticas": {
+    "exhaustiva": {
+      "nodos": 63,
+      "combinaciones": 36
+    },
+    "backtracking": {
+      "nodos": 46,
+      "combinaciones": 16
+    }
+  }
+}
