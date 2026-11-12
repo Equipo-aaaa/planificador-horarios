@@ -1,0 +1,168 @@
+{
+  "opciones": [
+    {
+      "secciones": [
+        {
+          "clave": "IL355",
+          "nrc": "100001",
+          "rango": 0
+        },
+        {
+          "clave": "IL356",
+          "nrc": "100011",
+          "rango": 0
+        },
+        {
+          "clave": "IL357",
+          "nrc": "100021",
+          "rango": 0
+        },
+        {
+          "clave": "MT201",
+          "nrc": "100032",
+          "rango": 0
+        }
+      ],
+      "puntaje": {
+        "conflictos": 2,
+        "prioridad": 0,
+        "minutosFuera": 0,
+        "costo": 0,
+        "huecos": 250
+      },
+      "empalmes": [
+        {
+          "claveA": "IL355",
+          "nrcA": "100001",
+          "claveB": "IL356",
+          "nrcB": "100011",
+          "dia": 0,
+          "inicio": 420,
+          "fin": 535
+        },
+        {
+          "claveA": "IL355",
+          "nrcA": "100001",
+          "claveB": "IL356",
+          "nrcB": "100011",
+          "dia": 2,
+          "inicio": 420,
+          "fin": 535
+        }
+      ]
+    },
+    {
+      "secciones": [
+        {
+          "clave": "IL355",
+          "nrc": "100001",
+          "rango": 0
+        },
+        {
+          "clave": "IL356",
+          "nrc": "100011",
+          "rango": 0
+        },
+        {
+          "clave": "IL357",
+          "nrc": "100021",
+          "rango": 0
+        },
+        {
+          "clave": "MT201",
+          "nrc": "100031",
+          "rango": 1
+        }
+      ],
+      "puntaje": {
+        "conflictos": 2,
+        "prioridad": 1,
+        "minutosFuera": 0,
+        "costo": 100,
+        "huecos": 0
+      },
+      "empalmes": [
+        {
+          "claveA": "IL355",
+          "nrcA": "100001",
+          "claveB": "IL356",
+          "nrcB": "100011",
+          "dia": 0,
+          "inicio": 420,
+          "fin": 535
+        },
+        {
+          "claveA": "IL355",
+          "nrcA": "100001",
+          "claveB": "IL356",
+          "nrcB": "100011",
+          "dia": 2,
+          "inicio": 420,
+          "fin": 535
+        }
+      ]
+    },
+    {
+      "secciones": [
+        {
+          "clave": "IL355",
+          "nrc": "100001",
+          "rango": 0
+        },
+        {
+          "clave": "IL356",
+          "nrc": "100011",
+          "rango": 0
+        },
+        {
+          "clave": "IL357",
+          "nrc": "100022",
+          "rango": 1
+        },
+        {
+          "clave": "MT201",
+          "nrc": "100032",
+          "rango": 0
+        }
+      ],
+      "puntaje": {
+        "conflictos": 2,
+        "prioridad": 1,
+        "minutosFuera": 0,
+        "costo": 100,
+        "huecos": 20
+      },
+      "empalmes": [
+        {
+          "claveA": "IL355",
+          "nrcA": "100001",
+          "claveB": "IL356",
+          "nrcB": "100011",
+          "dia": 0,
+          "inicio": 420,
+          "fin": 535
+        },
+        {
+          "claveA": "IL355",
+          "nrcA": "100001",
+          "claveB": "IL356",
+          "nrcB": "100011",
+          "dia": 2,
+          "inicio": 420,
+          "fin": 535
+        }
+      ]
+    }
+  ],
+  "sinOpciones": [],
+  "estadisticas": {
+    "exhaustiva": {
+      "nodos": 11,
+      "combinaciones": 6
+    },
+    "backtracking": {
+      "nodos": 9,
+      "combinaciones": 3
+    }
+  }
+}

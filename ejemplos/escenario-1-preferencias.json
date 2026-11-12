@@ -1,0 +1,48 @@
+{
+  "ciclo": "202620",
+  "turno": {
+    "tipo": "matutino",
+    "inicio": 420,
+    "fin": 900
+  },
+  "materias": [
+    {
+      "clave": "IL355",
+      "orden": [
+        "100001",
+        "100002",
+        "100003"
+      ],
+      "descartadas": [],
+      "fijada": null
+    },
+    {
+      "clave": "IL356",
+      "orden": [
+        "100011",
+        "100012"
+      ],
+      "descartadas": [],
+      "fijada": null
+    },
+    {
+      "clave": "IL357",
+      "orden": [
+        "100021",
+        "100022",
+        "100023"
+      ],
+      "descartadas": [],
+      "fijada": null
+    },
+    {
+      "clave": "MT201",
+      "orden": [
+        "100032",
+        "100031"
+      ],
+      "descartadas": [],
+      "fijada": null
+    }
+  ]
+}
