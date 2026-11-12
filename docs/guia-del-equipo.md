@@ -122,12 +122,12 @@ Por ejemplo, Andrés puede dibujar la cuadrícula hoy mismo con `escenario-1-res
   3. Programa y prueba.
   4. Escribe el resumen, presiona *Commit*, luego *Publish branch* y *Create Pull Request*.
   5. En el PR escribe `Closes #n` con el número de tu issue, para que se cierre sola al integrarse.
-- **En el tablero,** mueve tu issue a *En progreso* al empezar y a *En revisión* al abrir el PR. Tus tareas van en orden numérico; revisa su "Depende de" antes de empezar.
+- **En el tablero,** mueve tu issue a *En progreso* al empezar y a *En revisión* al abrir el PR. Tus tareas van en orden numérico; revisa su "Depende de" antes de empezar. El backlog completo también está en `docs/backlog.md`.
 - **Revisiones:** Diego o Daniel revisan y aprueban cada PR, incluidos los suyos.
 - **Cada módulo visual tiene su demo** en `demos/`: una página que lo muestra con los datos de ejemplo. Es lo que se abre para revisar tu PR. El núcleo y el algoritmo se prueban en Node.
 - **Para probar en tu computadora** usa Live Server de VS Code; con doble clic en el HTML los módulos de JavaScript no funcionan.
 - **Trabaja solo en tus carpetas.** Si necesitas algo de otra parte, usa el contrato o los ejemplos.
-- **Si usas Claude,** carga el `CLAUDE.md` del repo en las instrucciones de tu proyecto y sube los tres contratos y los ejemplos. Así te sugiere lo mismo que a los demás.
+- **Si usas Claude,** carga el `CLAUDE.md` del repo en las instrucciones de tu proyecto y sube los archivos de `docs/` (contratos, guía y backlog) y los ejemplos. Así te sugiere lo mismo que a los demás.
 
 ## 8. Términos que vas a ver
 
