@@ -1,0 +1,6 @@
+{
+  "name": "planificador-horarios",
+  "private": true,
+  "description": "Genera opciones de horario sin empalmes para estudiantes de CUCEI",
+  "type": "module"
+}

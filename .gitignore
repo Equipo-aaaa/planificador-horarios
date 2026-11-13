@@ -1,0 +1,6 @@
+# Carpeta local que crea Netlify CLI (netlify dev / netlify link)
+.netlify/
+
+node_modules/
+.DS_Store
+Thumbs.db
