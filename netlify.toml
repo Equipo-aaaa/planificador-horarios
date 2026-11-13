@@ -1,0 +1,15 @@
+# Configuración de Netlify (DA-02).
+# El sitio es estático: no hay comando de build, se publica la raíz del repo tal cual.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# La página llama a /api/oferta y /api/ciclos (contrato-modulos.md).
+# Netlify publica cada función en /.netlify/functions/<nombre>; esta regla
+# traduce una ruta a la otra. status = 200 hace que sea una reescritura
+# interna: el navegador sigue viendo /api/..., no hay redirección visible.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
