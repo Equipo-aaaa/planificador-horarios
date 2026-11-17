@@ -5,7 +5,7 @@
 //   { ciclo, descargada, fuente: "siiau", materias: [Materia] }
 
 // SIIAU no tiene API: esta es la dirección a la que su formulario hace POST.
-const URL_CONSULTA = "http://consulta.siiau.udg.mx/wco/sspseca.consulta_oferta";
+export const URL_CONSULTA = "http://consulta.siiau.udg.mx/wco/sspseca.consulta_oferta";
 
 // Clave del centro universitario en SIIAU; CUCEI es "D".
 const CENTRO_CUCEI = "D";
@@ -58,9 +58,14 @@ export default async (peticion) => {
     const filas = [];
     let url = URL_CONSULTA;
     let cuerpo = formulario;
+    const vistos = new Set();
     for (let pagina = 0; pagina < MAX_PAGINAS && url; pagina++) {
       const html = await pedirHtml(url, cuerpo, limite);
-      filas.push(...leerFilas(html));
+      const nuevas = leerFilas(html).filter((f) => !vistos.has(f.nrc));
+      // Si una página ya no trae NRC nuevos, SIIAU nos está repitiendo: paramos.
+      if (pagina > 0 && nuevas.length === 0) break;
+      nuevas.forEach((f) => vistos.add(f.nrc));
+      filas.push(...nuevas);
       ({ url, cuerpo } = siguientePagina(html) ?? {});
     }
 
@@ -80,7 +85,7 @@ export default async (peticion) => {
 
 // Envía el formulario y devuelve el HTML. SIIAU responde en Latin-1,
 // no en UTF-8; si lo leyéramos con .text() la Ñ y los acentos saldrían rotos.
-async function pedirHtml(url, cuerpo, limite) {
+export async function pedirHtml(url, cuerpo, limite) {
   const respuesta = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -180,7 +185,13 @@ export function agruparMaterias(filas) {
     }
     const existente = secciones.get(fila.nrc);
     if (existente) {
-      existente.sesiones.push(...fila.sesiones);
+      // Si el NRC ya salió en otra página con las mismas sesiones, no las
+      // repetimos: solo agregamos las que sean nuevas (teoría o laboratorio).
+      for (const s of fila.sesiones) {
+        const repetida = existente.sesiones.some((e) =>
+          e.dia === s.dia && e.inicio === s.inicio && e.fin === s.fin && e.edificio === s.edificio && e.aula === s.aula);
+        if (!repetida) existente.sesiones.push(s);
+      }
       if (!existente.profesor) existente.profesor = fila.profesor;
       continue;
     }
@@ -200,10 +211,11 @@ export function agruparMaterias(filas) {
 
 // Si SIIAU trae un formulario para ver la siguiente página, devuelve a dónde
 // enviarlo y con qué campos; si no, null. El botón "Otra búsqueda" no cuenta.
-function siguientePagina(html) {
+export function siguientePagina(html) {
   for (const [, atributos, contenido] of html.matchAll(/<form([^>]*)>([\s\S]*?)<\/form>/gi)) {
     const boton = contenido.match(/type=["']?submit["']?[^>]*value=["']?([^"'>]*)/i)?.[1] ?? "";
-    if (!/siguiente|>/i.test(boton)) continue;
+    // SIIAU lo escribe como "500 Pr&oacute;ximos" (con el acento como entidad HTML).
+    if (!/pr(?:&oacute;|ó|o)ximos|siguiente/i.test(boton)) continue;
 
     const accion = atributos.match(/action=["']?([^"'\s>]+)/i)?.[1];
     if (!accion) continue;
