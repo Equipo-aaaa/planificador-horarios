@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo: ficha de sección</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/modulos/ficha.css" rel="stylesheet">
+</head>
+<body class="bg-body-tertiary">
+  <main class="container py-4" style="max-width: 640px;">
+    <h1 class="h4 mb-1">Ficha de sección</h1>
+    <p class="text-secondary">Una ficha en cada estado, con los datos de <code>ejemplos/oferta-ejemplo.json</code>.</p>
+    <div id="fichas" class="d-flex flex-column gap-3"></div>
+    <p id="error" class="text-danger mt-3" hidden></p>
+  </main>
+
+  <script type="module">
+    import { crearFicha } from "../js/vista/ficha.js";
+
+    const contenedor = document.getElementById("fichas");
+
+    try {
+     
+      const respuesta = await fetch("../ejemplos/oferta-ejemplo.json");
+      const oferta = await respuesta.json();
+      const materias = Array.isArray(oferta) ? oferta : oferta.materias;
+      const materia = materias[0];
+      const seccion = materia.secciones[0];
+
+      const casos = [
+        { estado: "normal", rango: 0 },
+        { estado: "fijada", rango: 0 },
+        { estado: "conflicto", rango: 1 },
+        { estado: "descartada", rango: undefined },
+      ];
+
+      for (const caso of casos) {
+        contenedor.append(crearFicha(seccion, {
+          clave: materia.clave,
+          nombreMateria: materia.nombre,
+          rango: caso.rango,
+          estado: caso.estado,
+          descargada: oferta.descargada,
+        }));
+      }
+
+      const conLaboratorio = materias.flatMap((m) => m.secciones.map((s) => ({ m, s })))
+        .find(({ s }) => new Set(s.sesiones.map((x) => `${x.inicio}-${x.fin}`)).size > 1);
+      if (conLaboratorio) {
+        contenedor.append(crearFicha({ ...conLaboratorio.s, profesor: "" }, {
+          clave: conLaboratorio.m.clave,
+          nombreMateria: conLaboratorio.m.nombre,
+          rango: 2,
+          estado: "normal",
+          descargada: oferta.descargada,
+        }));
+      }
+    } catch (error) {
+      const aviso = document.getElementById("error");
+      aviso.textContent = `No se pudo cargar el ejemplo: ${error.message}`;
+      aviso.hidden = false;
+    }
+  </script>
+</body>
+</html>
