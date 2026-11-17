@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo: cuadrícula del horario</title>
+  <link rel="icon" href="data:,">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/modulos/cuadricula.css" rel="stylesheet">
+</head>
+<body class="bg-body-tertiary">
+  <main class="container py-4">
+    <h1 class="h4 mb-1">Cuadrícula del horario</h1>
+    <p class="text-secondary">
+      Opciones de <code>escenario-1-resultado.json</code> y <code>escenario-3-resultado.json</code>.
+      En el escenario 3 los empalmes deben verse en rojo el lunes y el miércoles.
+    </p>
+
+    <div class="d-flex flex-wrap gap-3 mb-3">
+      <div>
+        <label for="escenario" class="form-label mb-1">Escenario</label>
+        <select id="escenario" class="form-select">
+          <option value="1">1: turno matutino</option>
+          <option value="3">3: con conflictos</option>
+        </select>
+      </div>
+      <div>
+        <label for="opcion" class="form-label mb-1">Opción</label>
+        <select id="opcion" class="form-select"></select>
+      </div>
+    </div>
+
+    <p id="puntaje" class="small text-secondary"></p>
+    <div id="cuadricula" class="bg-white border rounded p-2"></div>
+    <p id="error" class="text-danger mt-3" hidden></p>
+  </main>
+
+  <script type="module">
+    import { montarCuadricula } from "../js/vista/cuadricula.js";
+
+    const selectorEscenario = document.getElementById("escenario");
+    const selectorOpcion = document.getElementById("opcion");
+    const textoPuntaje = document.getElementById("puntaje");
+    const textoError = document.getElementById("error");
+
+    function mostrarError(mensaje) {
+      textoError.textContent = mensaje;
+      textoError.hidden = false;
+    }
+
+    async function leerJSON(ruta) {
+      const respuesta = await fetch(ruta);
+      if (!respuesta.ok) throw new Error(`No se pudo leer ${ruta} (${respuesta.status})`);
+      return respuesta.json();
+    }
+
+    try {
+      const oferta = await leerJSON("../ejemplos/oferta-ejemplo.json");
+      const materias = Array.isArray(oferta) ? oferta : oferta.materias;
+      const resultados = {
+        1: await leerJSON("../ejemplos/escenario-1-resultado.json"),
+        3: await leerJSON("../ejemplos/escenario-3-resultado.json"),
+      };
+
+      const cuadricula = montarCuadricula(document.getElementById("cuadricula"), {
+        alEditar: (clave, nrc) => console.log("alEditar", clave, nrc),
+      });
+
+      function opcionesDe(resultado) {
+        return resultado.opciones ?? resultado.esperado?.opciones ?? resultado.backtracking?.opciones;
+      }
+
+      function dibujar() {
+        const lista = opcionesDe(resultados[selectorEscenario.value]);
+        if (!lista) {
+          const llaves = Object.keys(resultados[selectorEscenario.value]).join(", ");
+          throw new Error(`El resultado no trae "opciones". Llaves que sí trae: ${llaves}`);
+        }
+        const opcion = lista[Number(selectorOpcion.value)];
+        cuadricula.mostrar(opcion, materias);
+        const p = opcion.puntaje;
+        textoPuntaje.textContent =
+          `Conflictos: ${p.conflictos} · Costo: ${p.costo} · Huecos: ${p.huecos} min · Empalmes: ${opcion.empalmes.length}`;
+      }
+
+      function llenarOpciones() {
+        const lista = opcionesDe(resultados[selectorEscenario.value]) ?? [];
+        selectorOpcion.replaceChildren(...lista.map((_, i) => new Option(`Opción ${i + 1}`, i)));
+      }
+
+      function actualizar() {
+        textoError.hidden = true;
+        try { dibujar(); } catch (error) { mostrarError(error.message); }
+      }
+
+      selectorEscenario.addEventListener("change", () => { llenarOpciones(); actualizar(); });
+      selectorOpcion.addEventListener("change", actualizar);
+      llenarOpciones();
+      actualizar();
+    } catch (error) {
+      mostrarError(`No se pudo cargar el ejemplo: ${error.message}`);
+    }
+  </script>
+</body>
+</html>
