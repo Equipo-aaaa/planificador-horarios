@@ -1,0 +1,89 @@
+/* Estilos de la ficha. */
+
+.ficha {
+  --ficha-fondo: var(--color-superficie, #ffffff);
+  --ficha-borde: var(--color-borde, #d5d9e0);
+  --ficha-texto: var(--color-texto, #1f2933);
+  --ficha-suave: var(--color-texto-suave, #5f6b7a);
+  --ficha-acento: var(--color-acento, #2f6fed);
+  --ficha-peligro: var(--color-peligro, #c62828);
+
+  background: var(--ficha-fondo);
+  color: var(--ficha-texto);
+  border: 1px solid var(--ficha-borde);
+  border-left-width: 4px;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  touch-action: manipulation;
+}
+
+.ficha__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.ficha__materia {
+  font-weight: 600;
+}
+
+.ficha__identificacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  color: var(--ficha-suave);
+}
+
+.ficha__rango {
+  margin-left: auto;
+}
+
+.ficha__horarios {
+  font-variant-numeric: tabular-nums;
+}
+
+.ficha__cupo {
+  color: var(--ficha-suave);
+  font-size: 0.8125rem;
+}
+
+.ficha--fijada {
+  border-color: var(--ficha-acento);
+  background: color-mix(in srgb, var(--ficha-acento) 8%, var(--ficha-fondo));
+}
+
+.ficha--fijada .ficha__indicador {
+  color: var(--ficha-acento);
+}
+
+.ficha--descartada {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+.ficha--descartada .ficha__materia {
+  text-decoration: line-through;
+}
+
+.ficha--conflicto {
+  border-color: var(--ficha-peligro);
+  background: color-mix(in srgb, var(--ficha-peligro) 8%, var(--ficha-fondo));
+}
+
+.ficha--conflicto .ficha__indicador {
+  color: var(--ficha-peligro);
+}
+
+.ficha.sortable-chosen {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.ficha.sortable-ghost {
+  opacity: 0.4;
+}
