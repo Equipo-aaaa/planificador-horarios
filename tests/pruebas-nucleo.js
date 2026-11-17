@@ -13,6 +13,10 @@ import {
   evaluar,
   crearOpcion,
   compararOpciones,
+  cotaOptimista,
+  debePodar,
+  construirProblema,
+  editarOpcion,
 } from '../js/nucleo/index.js';
 
 const leer = (ruta) => JSON.parse(readFileSync(new URL(`../ejemplos/${ruta}`, import.meta.url)));
@@ -261,5 +265,174 @@ for (const n of [1, 2, 3]) {
     }
   });
 }
+
+console.log('\nCota y poda');
+
+const problema1 = construirProblema(oferta.materias, preferencias1);
+const resultado1 = leer('escenario-1-resultado.json');
+
+// Candidata de una materia del problema, por NRC.
+const candidataDe = (problema, nrc) =>
+  problema.materias.flatMap((m) => m.candidatas).find((c) => c.nrc === nrc);
+
+prueba('escenario 1: la cota al probar 100003 da 430 y la regla indica podar', () => {
+  const asignadas = [candidataDe(problema1, '100003')];
+  const restantes = problema1.materias.slice(1); // Bases de Datos, Redes, Ecuaciones
+  const cota = cotaOptimista(asignadas, restantes, problema1.turno);
+  assert.deepEqual(cota, { conflictos: 0, costo: 430 });
+  // En ese momento el top 3 tiene costos 100, 200 y 200: el peor es el tercero.
+  const peor = resultado1.opciones[2];
+  assert.equal(peor.puntaje.costo, 200);
+  assert.equal(debePodar(cota, peor), true);
+});
+
+prueba('sin nada asignado, la cota es la suma de la candidata más barata de cada materia', () => {
+  assert.deepEqual(cotaOptimista([], problema1.materias, problema1.turno), { conflictos: 0, costo: 0 });
+});
+
+prueba('la cota cuenta los conflictos que ya hay entre las asignadas', () => {
+  const asignadas = [candidataDe(problema1, '100001'), candidataDe(problema1, '100011')];
+  const cota = cotaOptimista(asignadas, problema1.materias.slice(2), problema1.turno);
+  assert.deepEqual(cota, { conflictos: 2, costo: 0 });
+});
+
+// La propiedad que hace segura a la poda: para cada horario a medio armar de las
+// 36 combinaciones, la cota nunca promete más de lo que el horario completo logra.
+prueba('escenario 1: en todos los prefijos de las 36 combinaciones la cota es optimista', () => {
+  for (const c of leer('escenario-1-todas.json')) {
+    const seleccion = c.nrcs.map((nrc) => candidataDe(problema1, nrc));
+    for (let k = 0; k <= seleccion.length; k++) {
+      const cota = cotaOptimista(seleccion.slice(0, k), problema1.materias.slice(k), problema1.turno);
+      assert.ok(cota.conflictos <= c.conflictos, `conflictos, NRC ${c.nrcs}, prefijo ${k}`);
+      assert.ok(cota.costo <= c.costo, `costo, NRC ${c.nrcs}, prefijo ${k}`);
+    }
+    // Con todo asignado, la cota es exacta.
+    const completa = cotaOptimista(seleccion, [], problema1.turno);
+    assert.deepEqual(completa, { conflictos: c.conflictos, costo: c.costo });
+  }
+});
+
+// Opción falsa con solo el puntaje, que es lo único que mira debePodar.
+const conPuntaje = (conflictos, costo) => ({ puntaje: { conflictos, costo, huecos: 0 } });
+
+prueba('con empate en conflictos y costo no se poda (podría ganar por huecos)', () => {
+  assert.equal(debePodar({ conflictos: 0, costo: 200 }, conPuntaje(0, 200)), false);
+});
+
+prueba('más conflictos que la tercera se poda aunque cueste menos', () => {
+  assert.equal(debePodar({ conflictos: 1, costo: 0 }, conPuntaje(0, 900)), true);
+});
+
+prueba('menos conflictos que la tercera no se poda aunque cueste más', () => {
+  assert.equal(debePodar({ conflictos: 0, costo: 900 }, conPuntaje(2, 0)), false);
+});
+
+console.log('\nArmado del problema');
+
+prueba('escenario 1: 4 materias con sus candidatas en el orden de preferencia', () => {
+  assert.deepEqual(problema1.turno, TURNOS.matutino);
+  assert.deepEqual(problema1.sinOpciones, []);
+  assert.deepEqual(
+    problema1.materias.map((m) => [m.clave, m.nombre, m.candidatas.map((c) => `${c.nrc}:${c.rango}`)]),
+    [
+      ['IL355', 'ANALISIS DE ALGORITMOS', ['100001:0', '100002:1', '100003:2']],
+      ['IL356', 'BASES DE DATOS', ['100011:0', '100012:1']],
+      ['IL357', 'REDES DE COMPUTADORAS', ['100021:0', '100022:1', '100023:2']],
+      // El orden lo decide el estudiante, no la oferta: 100032 va primero.
+      ['MT201', oferta.materias[3].nombre, ['100032:0', '100031:1']],
+    ]
+  );
+});
+
+prueba('cada candidata trae la sección completa de la oferta', () => {
+  for (const materia of problema1.materias) {
+    for (const c of materia.candidatas) {
+      assert.equal(c.clave, materia.clave);
+      assert.equal(c.seccion, seccionDeNrc(c.nrc)); // el mismo objeto, no una copia
+    }
+  }
+});
+
+prueba('escenario 3: la descartada no entra y la fijada es la única candidata', () => {
+  const problema3 = construirProblema(oferta.materias, leer('escenario-3-preferencias.json'));
+  const candidatas = Object.fromEntries(
+    problema3.materias.map((m) => [m.clave, m.candidatas.map((c) => `${c.nrc}:${c.rango}`)])
+  );
+  assert.deepEqual(candidatas, {
+    IL355: ['100001:0'],
+    IL356: ['100011:0'],
+    IL357: ['100021:0', '100022:1', '100023:2'],
+    MT201: ['100032:0', '100031:1'],
+  });
+  assert.deepEqual(problema3.sinOpciones, []);
+});
+
+// Copia de las preferencias del escenario 1 con cambios en una materia.
+// structuredClone hace una copia profunda, como copy.deepcopy de Python.
+function preferenciasCon(clave, cambios) {
+  const pref = structuredClone(preferencias1);
+  Object.assign(pref.materias.find((m) => m.clave === clave), cambios);
+  return pref;
+}
+
+prueba('una fijada que no es la favorita conserva su rango', () => {
+  const problema = construirProblema(oferta.materias, preferenciasCon('IL356', { fijada: '100012' }));
+  const bases = problema.materias.find((m) => m.clave === 'IL356');
+  assert.deepEqual(bases.candidatas.map((c) => [c.nrc, c.rango]), [['100012', 1]]);
+});
+
+prueba('una materia con todas sus secciones descartadas va a sinOpciones', () => {
+  const pref = preferenciasCon('IL357', { orden: [], descartadas: ['100021', '100022', '100023'] });
+  const problema = construirProblema(oferta.materias, pref);
+  assert.deepEqual(problema.materias.map((m) => m.clave), ['IL355', 'IL356', 'MT201']);
+  assert.deepEqual(problema.sinOpciones, ['IL357']);
+});
+
+prueba('un NRC que ya no viene en la oferta se salta y los demás conservan su rango', () => {
+  const pref = preferenciasCon('IL355', { orden: ['999999', '100001', '100002'] });
+  const problema = construirProblema(oferta.materias, pref);
+  assert.deepEqual(problema.materias[0].candidatas.map((c) => [c.nrc, c.rango]), [
+    ['100001', 1],
+    ['100002', 2],
+  ]);
+});
+
+prueba('cambiar el turno de las preferencias después no altera el problema armado', () => {
+  const pref = structuredClone(preferencias1);
+  const problema = construirProblema(oferta.materias, pref);
+  pref.turno.inicio = 0;
+  assert.equal(problema.turno.inicio, 420);
+});
+
+console.log('\nEdición manual');
+
+prueba('cambiar Bases de Datos a 100011 en la opción 1 crea el choque y lo evalúa', () => {
+  const original = resultado1.opciones[0];
+  const copiaOriginal = structuredClone(original);
+  const editada = editarOpcion(original, 'IL356', '100011', problema1);
+  assert.deepEqual(editada.secciones.map((s) => s.nrc), ['100001', '100011', '100021', '100032']);
+  assert.deepEqual(editada.puntaje, { conflictos: 2, prioridad: 0, minutosFuera: 0, costo: 0, huecos: 250 });
+  assert.equal(editada.empalmes.length, 2);
+  assert.deepEqual(original, copiaOriginal); // la opción original no cambia
+});
+
+prueba('editar y regresar a la sección original da la opción original', () => {
+  const original = resultado1.opciones[0];
+  const ida = editarOpcion(original, 'IL357', '100023', problema1);
+  const vuelta = editarOpcion(ida, 'IL357', '100021', problema1);
+  assert.deepEqual(vuelta, original);
+});
+
+prueba('un NRC que no es candidata de esa materia lanza un error', () => {
+  const original = resultado1.opciones[0];
+  assert.throws(() => editarOpcion(original, 'IL356', '100021', problema1), /no es una candidata/);
+  assert.throws(() => editarOpcion(original, 'XX000', '100011', problema1), /no está en la opción/);
+});
+
+prueba('escenario 3: no se puede cambiar una materia fijada a otra sección', () => {
+  const problema3 = construirProblema(oferta.materias, leer('escenario-3-preferencias.json'));
+  const opcion = leer('escenario-3-resultado.json').opciones[0];
+  assert.throws(() => editarOpcion(opcion, 'IL356', '100012', problema3), /no es una candidata/);
+});
 
 console.log(`\n${pruebas} pruebas pasaron`);
