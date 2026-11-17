@@ -1,0 +1,103 @@
+/* Estilos de la cuadrícula. con un valor por defecto */
+
+.cuadricula {
+  --cuadricula-borde: var(--color-borde, #d5d9e0);
+  --cuadricula-texto: var(--color-texto, #1f2933);
+  --cuadricula-suave: var(--color-texto-suave, #5f6b7a);
+  --cuadricula-peligro: var(--color-peligro, #c62828);
+
+  color: var(--cuadricula-texto);
+  overflow-x: auto;
+}
+
+.cuadricula__tabla {
+  --alto-hora: 3rem;
+  display: grid;
+  grid-template-columns: 3.25rem repeat(6, minmax(5.5rem, 1fr));
+  grid-template-rows: auto calc(14 * var(--alto-hora));
+  min-width: 42rem;
+  padding-bottom: 0.6rem;
+}
+
+.cuadricula__dia {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--cuadricula-borde);
+}
+
+.cuadricula__horas {
+  position: relative;
+}
+
+.cuadricula__hora {
+  position: absolute;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--cuadricula-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.cuadricula__columna {
+  position: relative;
+  border-left: 1px solid var(--cuadricula-borde);
+  /* Una línea al inicio de cada hora. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--cuadricula-borde) 0,
+    var(--cuadricula-borde) 1px,
+    transparent 1px,
+    transparent var(--alto-hora)
+  );
+}
+.cuadricula__bloque {
+  --tono: 210;
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0.2rem 0.35rem;
+  border-radius: 6px;
+  border-left: 4px solid hsl(var(--tono) 55% 42%);
+  background: hsl(var(--tono) 70% 92%);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  display: flex;
+  flex-direction: column;
+}
+
+.cuadricula__materia {
+  font-weight: 600;
+}
+
+.cuadricula__detalle {
+  color: var(--cuadricula-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.cuadricula__bloque--c0 { --tono: 210; }
+.cuadricula__bloque--c1 { --tono: 150; }
+.cuadricula__bloque--c2 { --tono: 30; }
+.cuadricula__bloque--c3 { --tono: 280; }
+.cuadricula__bloque--c4 { --tono: 340; }
+.cuadricula__bloque--c5 { --tono: 180; }
+.cuadricula__bloque--c6 { --tono: 55; }
+.cuadricula__bloque--c7 { --tono: 245; }
+
+.cuadricula__empalme {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  border: 2px solid var(--cuadricula-peligro);
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(198, 40, 40, 0.55) 0,
+    rgba(198, 40, 40, 0.55) 6px,
+    rgba(198, 40, 40, 0.25) 6px,
+    rgba(198, 40, 40, 0.25) 12px
+  );
+  pointer-events: none;
+}
