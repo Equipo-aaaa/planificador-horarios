@@ -50,6 +50,10 @@ export function leerCiclos(html) {
   // 2. Cada opción trae value="202620" y un texto visible.
   const ciclos = [];
   for (const [, id, texto] of select[1].matchAll(/<option[^>]*value=["']?(\d{6})["']?[^>]*>([^<]*)/gi)) {
+    // Solo calendarios A (termina en 10) y B (termina en 20). Los de verano
+    // (80) desplazarían al ciclo en curso de los 3 que mostramos, y la app
+    // es para armar el horario de un semestre normal.
+    if (!id.endsWith("10") && !id.endsWith("20")) continue;
     ciclos.push({ id, nombre: limpiarNombre(texto, id) });
   }
   return ciclos;
