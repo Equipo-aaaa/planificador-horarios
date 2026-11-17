@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planificador de horarios · CUCEI</title>
+  <meta name="description" content="Genera opciones de horario sin empalmes a partir de la oferta de SIIAU.">
+
+  <!-- Aplica el tema guardado antes de pintar, para que no parpadee al recargar -->
+  <script>
+    try {
+      const tema = localStorage.getItem('horarios:tema');
+      if (tema === 'dark' || tema === 'light') document.documentElement.dataset.bsTheme = tema;
+    } catch { /* sin localStorage se queda el tema claro */ }
+  </script>
+
+  <!-- Tipografías: Geist (texto) y Geist Mono (NRC, horas y cifras) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 + iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Estilos propios (siempre DESPUÉS de Bootstrap para poder sobrescribirlo).
+       Cada módulo agrega aquí su hoja de css/modulos/ al integrarse. -->
+  <link href="css/estilos.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ===================== Barra superior ===================== -->
+  <header class="barra">
+    <!-- Botón ≡: solo en móvil, abre el buscador -->
+    <button class="boton-icono d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#columnaEntrada"
+            aria-controls="columnaEntrada" aria-label="Abrir buscador">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <a class="marca" href="index.html">
+      <span class="marca-icono"><i class="bi bi-calendar3-week"></i></span>
+      <span class="marca-texto">Planificador de horarios <small>CUCEI · 2026B</small></span>
+    </a>
+
+    <nav class="pestanas-pagina">
+      <a href="index.html" aria-current="page">Horario</a>
+      <a href="analisis.html">Análisis</a>
+    </nav>
+
+    <div class="barra-derecha">
+      <!-- La integración cambia data-fuente y el texto según RespuestaOferta.fuente -->
+      <span class="estado-fuente" id="estado-fuente" data-fuente="">
+        <span class="luz"></span><span id="estado-fuente-texto">Sin oferta cargada</span>
+      </span>
+      <button class="boton-icono" type="button" id="btn-tema" aria-label="Cambiar a tema oscuro">
+        <i class="bi bi-moon"></i>
+      </button>
+      <img src="img/escudo-cucei.webp" alt="CUCEI" class="escudo">
+    </div>
+  </header>
+
+  <!-- ===================== Tres columnas ===================== -->
+  <main class="app">
+
+    <!-- Buscador. offcanvas-lg: en escritorio es una columna normal;
+         en móvil se vuelve un menú que entra desde la izquierda con el botón ≡ -->
+    <aside class="columna columna-entrada offcanvas-lg offcanvas-start" tabindex="-1" id="columnaEntrada"
+           aria-labelledby="tituloEntrada">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-semibold" id="tituloEntrada">Tus materias</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#columnaEntrada"
+                aria-label="Cerrar"></button>
+      </div>
+      <!-- Daniel: montarPanelEntrada -->
+      <div id="panel-entrada" data-vacio="Panel de entrada: ciclo, búsqueda, materias y turno"></div>
+    </aside>
+
+    <!-- Centro: opciones generadas y horario semanal -->
+    <section class="columna columna-centro">
+      <!-- Diego: pestañas de opción, puntaje, Generar, Copiar NRC y Guardar imagen -->
+      <div id="opciones" data-vacio="Opciones: Opción 1, 2, 3 · puntaje · Generar"></div>
+      <!-- Andrés: montarCuadricula -->
+      <div id="cuadricula" data-vacio="Cuadrícula: horario de lunes a sábado, 7:00 a 21:00"></div>
+    </section>
+
+    <!-- Prioridades -->
+    <section class="columna columna-prioridades" aria-labelledby="tituloPrioridades">
+      <h2 class="titulo-seccion" id="tituloPrioridades">Prioridades</h2>
+      <p class="ayuda">Arrastra para ordenar: arriba va tu favorita.</p>
+      <!-- Andrés: montarListasPrioridad -->
+      <div id="listas-prioridad" data-vacio="Listas de prioridad: una lista de fichas por materia"></div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <span>Proyecto final de Análisis de Algoritmos · CUCEI, Universidad de Guadalajara · 2026B</span>
+    <span>Los cupos se muestran con la hora de descarga; revísalos en SIIAU antes de registrarte.</span>
+  </footer>
+
+  <!-- JS de Bootstrap: necesario para el menú deslizable en móvil -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Librerías de los módulos, como variables globales (contrato-modulos.md) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- type="module" permite usar import/export. Requiere Live Server o Netlify (no file://) -->
+  <script type="module" src="js/app/tema.js"></script>
+</body>
+</html>

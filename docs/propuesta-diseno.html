@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propuesta de diseño (DI-06) · Planificador de horarios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+/* Maqueta aprobada en DI-06, con datos del escenario 1. Es una REFERENCIA visual:
+   no se importa desde la app. Muestra cómo se esperan la ficha, la cuadrícula,
+   los choques, la línea de hora y el resaltado por NRC.
+   Aplicación de tres columnas (buscador · horario · prioridades).
+   Tema claro con la paleta de VisuAlgoritmos; oscuro sobre el negro #08080a. */
+:root, [data-tema="claro"] {
+  --fondo: #FAFAFA;
+  --superficie: #FFFFFF;
+  --superficie-2: #F4F4F5;
+  --linea: #E4E4E7;
+  --linea-fuerte: #D4D4D8;
+  --texto: #18181B;
+  --texto-2: #52525B;
+  --texto-3: #A1A1AA;
+  --acento: #0891B2;           /* cian para texto */
+  --acento-relleno: #06B6D4;   /* cian para rellenos */
+  --sobre-acento: #04262D;
+  --conflicto: #E11D48;
+  --exito: #059669;
+  --materia-1: #06B6D4; --materia-2: #6366F1; --materia-3: #10B981; --materia-4: #F59E0B;
+  --materia-5: #8B5CF6; --materia-6: #84CC16; --materia-7: #F97316; --materia-8: #71717A;
+  --sombra: 0 1px 2px rgba(24, 24, 27, .06), 0 8px 24px rgba(24, 24, 27, .06);
+}
+[data-tema="oscuro"] {
+  --fondo: #08080A;
+  --superficie: #0F0F12;
+  --superficie-2: #17171B;
+  --linea: #222227;
+  --linea-fuerte: #2E2E35;
+  --texto: #EDEDEF;
+  --texto-2: #A1A1AA;
+  --texto-3: #5F5F68;
+  --acento: #22D3EE;
+  --acento-relleno: #22D3EE;
+  --sobre-acento: #04262D;
+  --conflicto: #FB7185;
+  --exito: #34D399;
+  --materia-1: #22D3EE; --materia-2: #818CF8; --materia-3: #34D399; --materia-4: #FBBF24;
+  --materia-5: #A78BFA; --materia-6: #A3E635; --materia-7: #FB923C; --materia-8: #A1A1AA;
+  --sombra: 0 0 0 1px #222227, 0 8px 24px rgba(0, 0, 0, .5);
+}
+:root {
+  --sans: 'Geist', system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+  --hora: 42px;
+  --alto-barra: 56px;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--fondo); color: var(--texto); transition: background-color .2s, color .2s; }
+body { margin: 0; font: 400 13.5px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+.mono { font-family: var(--mono); font-feature-settings: 'zero'; }
+::selection { background: var(--acento-relleno); color: var(--sobre-acento); }
+
+/* ===================================================== BARRA SUPERIOR */
+.barra { height: var(--alto-barra); display: flex; align-items: center; gap: 1.25rem; padding: 0 1.25rem;
+  border-bottom: 1px solid var(--linea); background: var(--fondo); position: sticky; top: 0; z-index: 20; }
+.marca { display: flex; align-items: center; gap: .6rem; font-weight: 600; letter-spacing: -.01em; }
+.marca .icono { width: 28px; height: 28px; border-radius: 8px; background: var(--acento-relleno); color: var(--sobre-acento);
+  display: grid; place-items: center; }
+.marca small { color: var(--texto-3); font-weight: 400; margin-left: .15rem; }
+.pestanas-pagina { display: flex; gap: .25rem; margin-left: .5rem; }
+.pestanas-pagina a { padding: .35rem .7rem; border-radius: 8px; color: var(--texto-2); text-decoration: none; font-weight: 500; }
+.pestanas-pagina a:hover { background: var(--superficie-2); color: var(--texto); }
+.pestanas-pagina a[aria-current] { background: var(--superficie-2); color: var(--texto); }
+.barra .derecha { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+.estado-fuente { display: inline-flex; align-items: center; gap: .45rem; font-size: 12px; color: var(--texto-2);
+  border: 1px solid var(--linea); border-radius: 999px; padding: .2rem .65rem; }
+.estado-fuente .luz { width: 7px; height: 7px; border-radius: 50%; background: var(--exito); box-shadow: 0 0 0 3px color-mix(in srgb, var(--exito) 20%, transparent); }
+.boton-icono { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--texto-2); border: 1px solid var(--linea); }
+.boton-icono:hover { color: var(--texto); background: var(--superficie-2); }
+.escudo { height: 30px; opacity: .9; }
+[data-tema="claro"] .escudo { filter: invert(1) brightness(.35); }   /* el escudo es blanco */
+
+/* ===================================================== TRES COLUMNAS */
+.app { display: grid; grid-template-columns: 18rem minmax(0, 1fr) 21rem; height: calc(100vh - var(--alto-barra)); }
+.columna { overflow-y: auto; padding: 1.25rem 1.25rem 2rem; scrollbar-width: thin; scrollbar-color: var(--linea-fuerte) transparent; }
+.columna + .columna { border-left: 1px solid var(--linea); }
+.izquierda { background: var(--fondo); }
+.centro { background: var(--superficie); padding: 1.25rem 1.5rem 2rem; }
+.titulo-seccion { display: flex; align-items: center; gap: .55rem; font-size: 12px; font-weight: 600; color: var(--texto); margin: 0 0 .7rem; }
+.titulo-seccion .num { font: 500 10.5px var(--mono); color: var(--acento); border: 1px solid color-mix(in srgb, var(--acento) 35%, transparent);
+  border-radius: 6px; padding: .05rem .35rem; }
+.titulo-seccion .cuenta { margin-left: auto; font: 500 11px var(--mono); color: var(--texto-3); }
+
+/* ----- Buscador ----- */
+.paso { padding-bottom: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--linea); }
+.paso:last-child { border-bottom: 0; }
+.campo { width: 100%; height: 36px; padding: 0 .75rem; border-radius: 8px; border: 1px solid var(--linea);
+  background: var(--superficie); color: var(--texto); outline: none; transition: border-color .15s, box-shadow .15s; appearance: none; }
+.campo::placeholder { color: var(--texto-3); }
+.campo:focus { border-color: var(--acento-relleno); box-shadow: 0 0 0 3px color-mix(in srgb, var(--acento-relleno) 20%, transparent); }
+select.campo { background-image: linear-gradient(45deg, transparent 50%, var(--texto-2) 50%), linear-gradient(-45deg, transparent 50%, var(--texto-2) 50%);
+  background-position: right 14px center, right 10px center; background-size: 4px 4px; background-repeat: no-repeat; padding-right: 1.8rem; }
+.con-icono { position: relative; }
+.con-icono .campo { padding-left: 2rem; }
+.con-icono svg { position: absolute; left: .7rem; top: 50%; transform: translateY(-50%); color: var(--texto-3); }
+.atajo { position: absolute; right: .5rem; top: 50%; transform: translateY(-50%); font: 10.5px var(--mono); color: var(--texto-3);
+  border: 1px solid var(--linea); border-radius: 5px; padding: 0 .3rem; }
+.nota { color: var(--texto-3); font-size: 11.5px; margin: .45rem 0 0; }
+
+.agregadas { list-style: none; margin: 0; padding: 0; }
+.agregadas li { display: flex; align-items: center; gap: .6rem; padding: .45rem .5rem; margin: 0 -.5rem; border-radius: 8px; }
+.agregadas li:hover { background: var(--superficie-2); }
+.agregadas li:hover .quitar { opacity: 1; }
+.letra { width: 22px; height: 22px; border-radius: 6px; flex: none; display: grid; place-items: center; font: 600 11px var(--mono);
+  background: color-mix(in srgb, var(--color) 16%, transparent); color: var(--color); }
+.agregadas .nombre { line-height: 1.25; }
+.agregadas small { display: block; font: 11px var(--mono); color: var(--texto-3); }
+.quitar { margin-left: auto; opacity: 0; color: var(--texto-3); font-size: 15px; line-height: 1; transition: opacity .15s; }
+.quitar:hover { color: var(--conflicto); }
+
+.segmentado { display: grid; grid-template-columns: repeat(4, 1fr); padding: 3px; gap: 2px; background: var(--superficie-2); border-radius: 9px; }
+.segmentado button { padding: .3rem 0; border-radius: 7px; color: var(--texto-2); font-size: 12px; font-weight: 500; }
+.segmentado button[aria-pressed="true"] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); }
+.riel { margin: 1.1rem 0 .3rem; position: relative; height: 4px; border-radius: 99px; background: var(--superficie-2); }
+.riel .tramo { position: absolute; inset: 0 auto 0 0; width: 57.1%; border-radius: 99px; background: var(--acento-relleno); }
+.riel .tope { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: var(--superficie);
+  border: 2px solid var(--acento-relleno); transform: translate(-50%, -50%); }
+.marcas { display: flex; justify-content: space-between; font: 10.5px var(--mono); color: var(--texto-3); }
+
+/* ----- Barra de opciones ----- */
+.opciones { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--linea); }
+.segmentado.opcion { display: inline-flex; grid-template-columns: none; }
+.segmentado.opcion button { padding: .4rem .7rem; font-size: 13px; display: inline-flex; align-items: center; gap: .45rem; }
+.segmentado.opcion .punto { width: 6px; height: 6px; border-radius: 50%; background: var(--exito); }
+.segmentado.opcion .punto.mal { background: var(--conflicto); }
+.metricas { display: flex; gap: 0; order: 3; width: 100%; padding-top: .2rem; }
+.metrica { padding: 0 .85rem; border-left: 1px solid var(--linea); }
+.metrica:first-child { border-left: 0; padding-left: 0; }
+.metrica { display: flex; align-items: baseline; gap: .45rem; }
+.metrica span { font-size: 12px; color: var(--texto-3); }
+.metrica b { font: 600 14px var(--mono); }
+.metrica b.mal { color: var(--conflicto); }
+.metrica b.bien { color: var(--exito); }
+.acciones { margin-left: auto; display: flex; align-items: center; gap: .9rem; }
+.boton { height: 36px; padding: 0 1rem; border-radius: 8px; background: var(--acento-relleno); color: var(--sobre-acento); font-weight: 600;
+  display: inline-flex; align-items: center; gap: .45rem; transition: transform .15s, filter .15s; }
+.boton:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.enlace { font-weight: 500; color: var(--texto-2); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--linea-fuerte);
+  display: inline-flex; align-items: center; gap: .35rem; }
+.enlace:hover { color: var(--texto); text-decoration-color: currentColor; }
+.enlace.hecho { color: var(--exito); text-decoration: none; }
+.aviso-choque[hidden] { display: none; }
+.aviso-choque { width: 100%; order: 4; display: flex; align-items: center; gap: .6rem; padding: .55rem .8rem; border-radius: 8px;
+  background: color-mix(in srgb, var(--conflicto) 10%, transparent); color: var(--conflicto); font-weight: 500; font-size: 12.5px; }
+.demo { font-size: 12px; color: var(--texto-3); margin: .9rem 0 0; }
+.demo button { color: var(--texto-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--linea-fuerte); }
+
+/* ----- Cuadrícula ----- */
+.tablero { margin-top: 1rem; display: grid; grid-template-columns: 2.75rem repeat(6, minmax(0, 1fr)); position: relative; }
+.tablero .dia { font-size: 11.5px; font-weight: 600; color: var(--texto-2); padding: 0 0 .5rem .5rem; border-bottom: 1px solid var(--linea); }
+.tablero .dia span { color: var(--texto-3); font-weight: 400; margin-left: .3rem; font-family: var(--mono); font-size: 10.5px; }
+.horas { position: relative; }
+.horas span { position: absolute; right: .55rem; transform: translateY(-50%); font: 10.5px var(--mono); color: var(--texto-3); }
+.col { position: relative; height: calc(var(--hora) * 14); border-left: 1px solid var(--linea);
+  background: repeating-linear-gradient(to bottom, var(--linea) 0 1px, transparent 1px var(--hora)); }
+.col.sabado { background-color: color-mix(in srgb, var(--superficie-2) 60%, transparent); }
+.bloque { position: absolute; left: 3px; right: 3px; padding: .3rem .45rem; border-radius: 7px; overflow: hidden;
+  background: color-mix(in srgb, var(--color) 14%, var(--superficie)); border-left: 3px solid var(--color);
+  font-size: 11px; line-height: 1.3; transition: transform .15s, box-shadow .15s; }
+.bloque b { display: block; font-weight: 600; color: color-mix(in srgb, var(--color) 55%, var(--texto)); }
+.bloque .mono { display: block; font-size: 10.5px; color: var(--texto-2); }
+.bloque.resaltado { transform: translateY(-2px); box-shadow: 0 0 0 1.5px var(--color), 0 6px 16px color-mix(in srgb, var(--color) 30%, transparent); z-index: 3; }
+.empalme { position: absolute; left: 0; right: 0; z-index: 4; pointer-events: none; border: 1.5px solid var(--conflicto); border-radius: 8px;
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--conflicto) 28%, transparent) 0 2px, transparent 2px 8px); }
+.empalme::after { content: 'choque'; position: absolute; right: -1.5px; bottom: -1.5px; background: var(--conflicto); color: #fff;
+  font: 600 9.5px/1 var(--mono); padding: .22rem .4rem; border-radius: 6px 0 7px 0; }
+.cursor-hora { position: absolute; left: 2.75rem; right: 0; border-top: 1px dashed var(--acento); pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 6; }
+.cursor-hora span { position: absolute; left: -2.75rem; top: -.6rem; width: 2.55rem; text-align: center; font: 600 10px/1.6 var(--mono);
+  color: var(--sobre-acento); background: var(--acento-relleno); border-radius: 5px; }
+.tablero:hover .cursor-hora { opacity: 1; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .9rem; font-size: 11.5px; color: var(--texto-2); }
+.leyenda span { display: inline-flex; align-items: center; gap: .4rem; }
+.leyenda i { width: 10px; height: 10px; border-radius: 3px; background: var(--color); }
+
+/* ----- Prioridades: el índice de fichas ----- */
+.derecha { background: var(--fondo); }
+.derecha .ayuda { margin: -.3rem 0 1.1rem; color: var(--texto-3); font-size: 12px; }
+.materia { margin-bottom: 1.4rem; }
+.materia header { display: flex; align-items: center; gap: .55rem; padding-bottom: .45rem; border-bottom: 1px solid var(--linea); }
+.materia header b { font-weight: 600; font-size: 12.5px; }
+.materia header small { margin-left: auto; color: var(--texto-3); font: 11px var(--mono); }
+.ficha { display: grid; grid-template-columns: .8rem 1.25rem 1fr auto; gap: .5rem; align-items: start;
+  padding: .55rem .4rem; margin: 0 -.4rem; border-bottom: 1px solid var(--linea); border-radius: 6px; cursor: grab; position: relative;
+  transition: background-color .15s; }
+.ficha:last-child { border-bottom: 0; }
+.ficha:hover { background: var(--superficie-2); }
+.ficha .asa { color: var(--texto-3); opacity: .5; padding-top: 2px; transition: opacity .15s; }
+.ficha:hover .asa { opacity: 1; }
+.ficha .rango { font: 500 11px/1.9 var(--mono); color: var(--texto-3); text-align: center; }
+.ficha .nrc { font: 600 12.5px var(--mono); }
+.ficha .sec { font: 11px var(--mono); color: var(--texto-3); margin-left: .25rem; }
+.ficha .detalle { display: block; color: var(--texto-2); font-size: 11.5px; }
+.ficha .cupo { text-align: right; font: 11px/1.4 var(--mono); color: var(--texto-3); }
+.ficha .cupo b { color: var(--texto); font-weight: 600; }
+.ficha .cupo b.poco { color: var(--conflicto); }
+.ficha.en-horario .rango { color: var(--sobre-acento); background: var(--color); border-radius: 5px; line-height: 1.75; }
+.ficha.en-horario .nrc { color: color-mix(in srgb, var(--color) 60%, var(--texto)); }
+.ficha.resaltada { background: color-mix(in srgb, var(--color) 10%, transparent); }
+.etiqueta { display: inline-block; margin-left: .35rem; font: 600 9.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--materia-2); background: color-mix(in srgb, var(--materia-2) 14%, transparent); border-radius: 4px; padding: .2rem .35rem; vertical-align: 1px; }
+
+.pie { padding: .9rem 1.25rem; border-top: 1px solid var(--linea); display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; font-size: 11.5px; color: var(--texto-3); }
+.pie .derecha-pie { margin-left: auto; }
+.pie button { color: var(--texto-3); text-decoration: underline; text-underline-offset: 3px; }
+
+.ver-contenedores [data-dueno] { outline: 1.5px dashed var(--materia-4); outline-offset: -2px; position: relative; }
+.ver-contenedores [data-dueno]::before { content: attr(data-dueno); position: absolute; top: 4px; right: 4px; z-index: 9;
+  background: var(--materia-4); color: #18181B; font: 600 10px var(--mono); padding: .1rem .4rem; border-radius: 4px; }
+
+/* ===================================================== RESPONSIVO */
+@media (max-width: 1180px) {
+  .app { grid-template-columns: 16rem minmax(0, 1fr); height: auto; }
+  .columna { overflow: visible; }
+  .derecha { grid-column: 1 / -1; border-left: 0 !important; border-top: 1px solid var(--linea); columns: 2 17rem; column-gap: 2rem; }
+  .derecha .titulo-seccion, .derecha .ayuda { column-span: all; }
+  .materia { break-inside: avoid; }
+}
+@media (max-width: 760px) {
+  .barra { gap: .6rem; padding: 0 .9rem; }
+  .marca small, .estado-fuente, .escudo { display: none; }
+  .marca { white-space: nowrap; font-size: 13px; }
+  .pestanas-pagina a { padding: .3rem .5rem; }
+  .pestanas-pagina { margin-left: 0; }
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .columna + .columna { border-left: 0; border-top: 1px solid var(--linea); }
+  .centro { overflow-x: auto; padding: 1.25rem 1rem; }
+  .tablero { min-width: 600px; }
+  .acciones { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="marca">
+    <span class="icono"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3M5 9h2M9 9h2M5 11.5h2"/></svg></span>
+    Planificador de horarios <small>CUCEI · 2026B</small>
+  </div>
+  <nav class="pestanas-pagina"><a href="#" aria-current="page">Horario</a><a href="#">Análisis</a></nav>
+  <div class="derecha">
+    <span class="estado-fuente"><span class="luz"></span>SIIAU · hoy 08:00</span>
+    <button class="boton-icono" id="btn-tema" title="Cambiar tema">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7Z"/></svg>
+    </button>
+    <img class="escudo" src="../img/escudo-cucei.webp" alt="CUCEI">
+  </div>
+</header>
+
+<main class="app">
+  <!-- #panel-entrada · Daniel -->
+  <aside class="columna izquierda" id="panel-entrada" data-dueno="#panel-entrada · Daniel">
+    <section class="paso">
+      <h2 class="titulo-seccion"><span class="num">01</span>Ciclo</h2>
+      <select class="campo"><option>Calendario 26 B</option><option>Calendario 27 A</option><option>Calendario 26 A</option></select>
+    </section>
+    <section class="paso">
+      <h2 class="titulo-seccion"><span class="num">02</span>Buscar materias</h2>
+      <div class="con-icono">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3.5 3.5"/></svg>
+        <input class="campo" placeholder="IL355 o algoritmos"><span class="atajo">/</span>
+      </div>
+      <select class="campo" style="margin-top:.5rem"><option>Todas las carreras</option><option>INCO</option><option>INNI</option></select>
+      <p class="nota">Por clave o por nombre. Solo materias de CUCEI.</p>
+    </section>
+    <section class="paso">
+      <h2 class="titulo-seccion"><span class="num">03</span>Agregadas<span class="cuenta">4</span></h2>
+      <ul class="agregadas" id="agregadas"></ul>
+    </section>
+    <section class="paso">
+      <h2 class="titulo-seccion"><span class="num">04</span>Turno</h2>
+      <div class="segmentado" id="turnos">
+        <button aria-pressed="true">Mañana</button><button aria-pressed="false">Tarde</button>
+        <button aria-pressed="false">Libre</button><button aria-pressed="false">Otro</button>
+      </div>
+      <div class="riel"><div class="tramo"></div><span class="tope" style="left:0%"></span><span class="tope" style="left:57.1%"></span></div>
+      <div class="marcas"><span>7:00</span><span style="color:var(--acento)">7:00 – 15:00</span><span>21:00</span></div>
+      <p class="nota">Una clase fuera de turno no se descarta: cuenta en contra.</p>
+    </section>
+  </aside>
+
+  <!-- Centro: #opciones (Diego) y #cuadricula (Andrés) -->
+  <section class="columna centro">
+    <div class="opciones" id="opciones" data-dueno="#opciones · Diego">
+      <div class="segmentado opcion" id="selector-opcion"></div>
+      <div class="metricas" id="metricas"></div>
+      <div class="acciones">
+        <button class="enlace" id="copiar"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span>Copiar NRC</span></button>
+        <button class="enlace">Guardar imagen</button>
+        <button class="boton">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8a5 5 0 0 1 8.5-3.5L13 6M13 2.5V6H9.5M13 8a5 5 0 0 1-8.5 3.5L3 10M3 13.5V10h3.5"/></svg>Generar
+        </button>
+      </div>
+      <div class="aviso-choque" id="aviso-choque" hidden>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1.8 15 14H1L8 1.8ZM8 6.5v3.2M8 11.6v.1"/></svg>
+        <span>No hay horario sin choques: Análisis de Algoritmos y Bases de Datos se empalman lun y mié de 7:00 a 8:55.</span>
+      </div>
+    </div>
+
+    <div id="cuadricula" data-dueno="#cuadricula · Andrés">
+      <div class="tablero" id="tablero"></div>
+      <div class="leyenda" id="leyenda"></div>
+    </div>
+    <p class="demo">Solo en la propuesta: <button id="ver-choque">ver un ejemplo con choque</button></p>
+  </section>
+
+  <!-- #listas-prioridad · Andrés -->
+  <section class="columna derecha" id="listas-prioridad" data-dueno="#listas-prioridad · Andrés">
+    <h2 class="titulo-seccion">Prioridades</h2>
+    <p class="ayuda">Arrastra para ordenar: arriba va tu favorita.</p>
+    <div id="listas"></div>
+  </section>
+</main>
+
+<footer class="pie">
+  <span>Proyecto final de Análisis de Algoritmos · CUCEI, UdeG</span>
+  <span>Los cupos se muestran con la hora de descarga; revísalos en SIIAU.</span>
+  <span class="derecha-pie"><button id="btn-contenedores">Ver contenedores del contrato</button></span>
+</footer>
+
+<script>
+const MATERIAS = [
+  { clave: 'IL355', letra: 'A', color: 'var(--materia-1)', nombre: 'Análisis de Algoritmos', orden: ['100001', '100002', '100003'], secciones: {
+    100001: ['D01', 'Ramírez López, Ana', 3, 40, [[0, 420, 535], [2, 420, 535]]],
+    100002: ['D02', 'Gómez Ruiz, Juan', 12, 40, [[1, 660, 775], [3, 660, 775]]],
+    100003: ['D03', 'Torres Díaz, Luis', 20, 40, [[0, 900, 1015], [2, 900, 1015]]] } },
+  { clave: 'IL356', letra: 'B', color: 'var(--materia-2)', nombre: 'Bases de Datos', orden: ['100011', '100012'], secciones: {
+    100011: ['D01', 'Herrera Soto, María', 1, 35, [[0, 420, 535], [2, 420, 535]]],
+    100012: ['D02', 'Castro Vega, Pedro', 9, 35, [[1, 540, 655], [3, 780, 895]]] } },
+  { clave: 'IL357', letra: 'C', color: 'var(--materia-3)', nombre: 'Redes de Computadoras', orden: ['100021', '100022', '100023'], secciones: {
+    100021: ['D01', 'Morales Núñez, Rosa', 5, 30, [[1, 660, 775], [3, 660, 775]]],
+    100022: ['D02', 'Flores Peña, Jorge', 14, 30, [[0, 540, 655], [2, 540, 655]]],
+    100023: ['D03', 'Morales Núñez, Rosa', 25, 30, [[1, 1020, 1135], [3, 1020, 1135]]] } },
+  { clave: 'MT201', letra: 'D', color: 'var(--materia-4)', nombre: 'Ecuaciones Diferenciales', orden: ['100032', '100031'], secciones: {
+    100031: ['D01', 'Jiménez Ortiz, Carlos', 30, 45, [[4, 420, 655]]],
+    100032: ['D02', 'Salazar Reyes, Laura', 8, 45, [[0, 660, 775], [2, 660, 775]]] } },
+];
+const OPCIONES = [
+  { nrcs: ['100001', '100012', '100021', '100032'], conflictos: 0, costo: 100, huecos: 260 },
+  { nrcs: ['100001', '100012', '100021', '100031'], conflictos: 0, costo: 200, huecos: 10 },
+  { nrcs: ['100001', '100012', '100022', '100032'], conflictos: 0, costo: 200, huecos: 20 },
+];
+const CON_CHOQUE = [
+  { nrcs: ['100001', '100011', '100021', '100032'], conflictos: 2, costo: 0, huecos: 250, empalmes: [[0, 420, 535], [2, 420, 535]], fijada: '100011' },
+  { nrcs: ['100001', '100011', '100021', '100031'], conflictos: 2, costo: 100, huecos: 0, empalmes: [[0, 420, 535], [2, 420, 535]], fijada: '100011' },
+  { nrcs: ['100001', '100011', '100022', '100032'], conflictos: 2, costo: 100, huecos: 20, empalmes: [[0, 420, 535], [2, 420, 535]], fijada: '100011' },
+];
+const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const INICIO = 420;
+const hhmm = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+const $ = (id) => document.getElementById(id);
+let lista = OPCIONES, indice = 0;
+
+function duracion(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  return h ? `${h} h${m ? ` ${m}` : ''}` : `${m} min`;
+}
+
+$('agregadas').innerHTML = MATERIAS.map((m) =>
+  `<li><span class="letra" style="--color:${m.color}">${m.letra}</span>
+     <span class="nombre">${m.nombre}<small>${m.clave} · ${m.orden.length} secciones</small></span>
+     <button class="quitar" title="Quitar">×</button></li>`).join('');
+$('leyenda').innerHTML = MATERIAS.map((m) => `<span style="--color:${m.color}"><i></i>${m.clave} ${m.nombre}</span>`).join('');
+
+function pintar() {
+  const op = lista[indice];
+
+  $('selector-opcion').innerHTML = lista.map((o, i) =>
+    `<button aria-pressed="${i === indice}" data-i="${i}"><span class="punto ${o.conflictos ? 'mal' : ''}"></span>Opción ${i + 1}</button>`).join('');
+  $('metricas').innerHTML = `
+    <div class="metrica"><span>Choques</span><b class="${op.conflictos ? 'mal' : 'bien'}">${op.conflictos}</b></div>
+    <div class="metrica"><span>Costo</span><b>${op.costo}</b></div>
+    <div class="metrica"><span>Huecos</span><b>${duracion(op.huecos)}</b></div>`;
+  $('aviso-choque').hidden = !op.conflictos;
+  $('ver-choque').textContent = lista === CON_CHOQUE ? 'volver al ejemplo normal' : 'ver un ejemplo con choque';
+
+  let html = '<div></div>' + DIAS.map((d) => `<div class="dia">${d}</div>`).join('');
+  html += '<div class="horas">' + Array.from({ length: 15 }, (_, h) =>
+    `<span style="top:calc(var(--hora) * ${h})">${7 + h}:00</span>`).join('') + '</div>';
+  for (let d = 0; d < 6; d++) {
+    html += `<div class="col${d === 5 ? ' sabado' : ''}">`;
+    // Si dos sesiones se traslapan, cada una ocupa media casilla para que se vean las dos.
+    const delDia = [];
+    for (const m of MATERIAS) {
+      const nrc = op.nrcs.find((n) => m.secciones[n]);
+      for (const [dia, i, f] of m.secciones[nrc][4]) if (dia === d) delDia.push({ m, nrc, i, f });
+    }
+    delDia.forEach((s, k) => {
+      const choca = delDia.filter((o) => o !== s && o.i < s.f && s.i < o.f);
+      s.lados = !choca.length ? '' : choca.some((o) => delDia.indexOf(o) < k) ? 'left:calc(50% + 2px);' : 'right:calc(50% + 2px);';
+    });
+    for (const { m, nrc, i, f, lados } of delDia) {
+      html += `<div class="bloque" data-nrc="${nrc}" style="--color:${m.color};${lados}top:calc(var(--hora) * ${(i - INICIO) / 60});height:calc(var(--hora) * ${(f - i) / 60})">
+        <b>${m.nombre}</b><span class="mono">${nrc} · ${hhmm(i)}–${hhmm(f)}</span></div>`;
+    }
+    for (const [dia, i, f] of op.empalmes || []) {
+      if (dia === d) html += `<div class="empalme" style="top:calc(var(--hora) * ${(i - INICIO) / 60});height:calc(var(--hora) * ${(f - i) / 60})"></div>`;
+    }
+    html += '</div>';
+  }
+  $('tablero').innerHTML = html + '<div class="cursor-hora" id="cursor-hora"><span></span></div>';
+
+  $('listas').innerHTML = MATERIAS.map((m) => `
+    <article class="materia" style="--color:${m.color}">
+      <header><span class="letra">${m.letra}</span><b>${m.nombre}</b><small>${m.clave}</small></header>
+      ${m.orden.map((nrc, r) => {
+        const [sec, prof, disp, cupo, ses] = m.secciones[nrc];
+        const dias = [...new Set(ses.map((s) => DIAS[s[0]].toLowerCase()))].join(' ');
+        const horas = [...new Set(ses.map((s) => `${hhmm(s[1])}–${hhmm(s[2])}`))].join(' / ');
+        return `<div class="ficha${op.nrcs.includes(nrc) ? ' en-horario' : ''}" data-nrc="${nrc}">
+          <svg class="asa" width="9" height="14" viewBox="0 0 9 14" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="7" cy="2" r="1.2"/><circle cx="2" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="2" cy="12" r="1.2"/><circle cx="7" cy="12" r="1.2"/></svg>
+          <span class="rango">${r + 1}</span>
+          <span><span class="nrc">${nrc}</span><span class="sec">${sec}</span>${op.fijada === nrc ? '<span class="etiqueta">fijada</span>' : ''}
+            <span class="detalle">${prof}</span><span class="detalle">${dias} · ${horas}</span></span>
+          <span class="cupo"><b class="${disp <= 3 ? 'poco' : ''}">${disp}</b>/${cupo}<br>8:00</span>
+        </div>`;
+      }).join('')}
+    </article>`).join('');
+}
+
+$('selector-opcion').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-i]'); if (b) { indice = Number(b.dataset.i); pintar(); }
+});
+$('ver-choque').addEventListener('click', () => { lista = lista === CON_CHOQUE ? OPCIONES : CON_CHOQUE; indice = 0; pintar(); });
+$('turnos').addEventListener('click', (e) => {
+  if (e.target.matches('button')) $('turnos').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b === e.target));
+});
+$('btn-contenedores').addEventListener('click', () => document.body.classList.toggle('ver-contenedores'));
+$('btn-tema').addEventListener('click', () => {
+  const raiz = document.documentElement; raiz.dataset.tema = raiz.dataset.tema === 'oscuro' ? 'claro' : 'oscuro';
+});
+$('copiar').addEventListener('click', (e) => {
+  const b = e.currentTarget; b.querySelector('span').textContent = 'Copiado'; b.classList.add('hecho');
+  setTimeout(() => { b.querySelector('span').textContent = 'Copiar NRC'; b.classList.remove('hecho'); }, 1600);
+});
+
+// La línea de hora sigue al cursor, redondeada a 5 minutos.
+$('tablero').addEventListener('mousemove', (e) => {
+  const cursor = $('cursor-hora'), col = $('tablero').querySelector('.col');
+  const y = e.clientY - col.getBoundingClientRect().top;
+  if (y < 0 || y > col.offsetHeight) { cursor.style.opacity = 0; return; }
+  const minutos = INICIO + Math.round((y / col.offsetHeight) * 840 / 5) * 5;
+  cursor.style.opacity = '';
+  cursor.style.top = `${col.offsetTop + ((minutos - INICIO) / 840) * col.offsetHeight}px`;
+  cursor.firstChild.textContent = hhmm(minutos);
+});
+
+// Pasar sobre una sesión resalta las demás sesiones del mismo NRC y su ficha, y al revés.
+function resaltar(nrc, si) {
+  document.querySelectorAll(`[data-nrc="${nrc}"]`).forEach((el) =>
+    el.classList.toggle(el.classList.contains('bloque') ? 'resaltado' : 'resaltada', si));
+}
+document.addEventListener('mouseover', (e) => { const el = e.target.closest('[data-nrc]'); if (el) resaltar(el.dataset.nrc, true); });
+document.addEventListener('mouseout', (e) => { const el = e.target.closest('[data-nrc]'); if (el) resaltar(el.dataset.nrc, false); });
+
+pintar();
+</script>
+</body>
+</html>

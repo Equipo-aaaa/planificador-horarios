@@ -1,0 +1,428 @@
+/* =========================================================================
+   Estilos comunes - Planificador de horarios
+   Bootstrap da la base (reinicio, grid, offcanvas); aquí van la paleta, la
+   tipografía, el esqueleto de tres columnas y unos componentes que pueden
+   usar todos los módulos. Cada módulo pone sus estilos en css/modulos/ y usa
+   estas variables, para que los dos temas funcionen sin repetir colores.
+
+   Tema: atributo data-bs-theme en <html> ("light" o "dark"). Se usa el mismo
+   atributo que Bootstrap para que sus componentes (offcanvas, botón de cerrar)
+   cambien de tema solos.
+   ========================================================================= */
+
+/* ---------- Paleta: tema claro (la de VisuAlgoritmos) ---------- */
+:root,
+[data-bs-theme="light"] {
+  --fondo:         #FAFAFA;   /* columnas laterales */
+  --superficie:    #FFFFFF;   /* columna central, campos */
+  --superficie-2:  #F4F4F5;   /* fondos de controles, hover */
+  --linea:         #E4E4E7;   /* divisiones de 1 px */
+  --linea-fuerte:  #D4D4D8;
+  --texto:         #18181B;
+  --texto-2:       #52525B;   /* texto secundario */
+  --texto-3:       #A1A1AA;   /* notas, etiquetas */
+
+  --acento:         #0891B2;  /* cian para texto y líneas */
+  --acento-relleno: #06B6D4;  /* cian para fondos (botón Generar) */
+  --sobre-acento:   #04262D;  /* texto encima del cian */
+  --conflicto:      #E11D48;  /* empalmes y avisos */
+  --exito:          #059669;
+
+  /* Un color por materia, en el orden en que se agregan */
+  --materia-1: #06B6D4;  --materia-2: #6366F1;
+  --materia-3: #10B981;  --materia-4: #F59E0B;
+  --materia-5: #8B5CF6;  --materia-6: #84CC16;
+  --materia-7: #F97316;  --materia-8: #71717A;
+
+  --sombra: 0 1px 2px rgba(24, 24, 27, .06), 0 8px 24px rgba(24, 24, 27, .06);
+}
+
+/* ---------- Paleta: tema oscuro (sobre el negro #08080a) ---------- */
+[data-bs-theme="dark"] {
+  --fondo:         #08080A;
+  --superficie:    #0F0F12;
+  --superficie-2:  #17171B;
+  --linea:         #222227;
+  --linea-fuerte:  #2E2E35;
+  --texto:         #EDEDEF;
+  --texto-2:       #A1A1AA;
+  --texto-3:       #5F5F68;
+
+  --acento:         #22D3EE;
+  --acento-relleno: #22D3EE;
+  --sobre-acento:   #04262D;
+  --conflicto:      #FB7185;
+  --exito:          #34D399;
+
+  --materia-1: #22D3EE;  --materia-2: #818CF8;
+  --materia-3: #34D399;  --materia-4: #FBBF24;
+  --materia-5: #A78BFA;  --materia-6: #A3E635;
+  --materia-7: #FB923C;  --materia-8: #A1A1AA;
+
+  --sombra: 0 0 0 1px #222227, 0 8px 24px rgba(0, 0, 0, .5);
+}
+
+/* ---------- Medidas y tipografía (iguales en los dos temas) ---------- */
+:root {
+  --sans: 'Geist', system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+  --alto-barra: 56px;
+  --ancho-entrada: 18rem;       /* columna del buscador */
+  --ancho-prioridades: 21rem;   /* columna de prioridades */
+}
+
+/* Bootstrap lee estas variables: así sus componentes usan nuestra paleta */
+:root,
+[data-bs-theme] {
+  --bs-body-bg: var(--fondo);
+  --bs-body-color: var(--texto);
+  --bs-border-color: var(--linea);
+  --bs-body-font-family: var(--sans);
+  --bs-body-font-size: .845rem;   /* 13.5 px: la página es densa en datos */
+  --bs-font-monospace: var(--mono);
+  --bs-offcanvas-bg: var(--fondo);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .2s, color .2s;
+}
+
+::selection { background: var(--acento-relleno); color: var(--sobre-acento); }
+
+/* Cifras con ancho fijo y el 0 con diagonal, para no confundirlo con la O */
+.mono { font-family: var(--mono); font-feature-settings: 'zero'; }
+
+/* =========================================================================
+   ESQUELETO
+
+   ┌ .barra ─────────────────────────────────────────────────────┐
+   │ [≡] Planificador · Horario  Análisis      SIIAU  ☾  CUCEI   │  ← [≡] solo en móvil
+   ├ .app ──────────────┬─────────────────────────┬──────────────┤
+   │ #panel-entrada     │ #opciones               │ Prioridades  │
+   │ (Daniel)           │ #cuadricula             │ #listas-     │
+   │                    │ (Diego / Andrés)        │ prioridad    │
+   │ scroll propio      │ scroll propio           │ scroll propio│
+   └────────────────────┴─────────────────────────┴──────────────┘
+   Menos de 1200 px: prioridades baja debajo, a todo lo ancho.
+   Menos de 992 px: el buscador se vuelve menú deslizable (offcanvas-lg).
+   ========================================================================= */
+
+/* ---------- Barra superior ---------- */
+.barra {
+  flex: none;
+  height: var(--alto-barra);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--linea);
+  background: var(--fondo);
+  position: sticky;
+  top: 0;
+  z-index: 1030;   /* por encima del contenido, por debajo del offcanvas */
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--texto);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.marca:hover { color: var(--texto); }
+
+.marca-icono {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--acento-relleno);
+  color: var(--sobre-acento);
+}
+
+.marca small { color: var(--texto-3); font-weight: 400; margin-left: .15rem; }
+
+.pestanas-pagina { display: flex; gap: .25rem; }
+.pestanas-pagina a {
+  padding: .35rem .7rem;
+  border-radius: 8px;
+  color: var(--texto-2);
+  text-decoration: none;
+  font-weight: 500;
+}
+.pestanas-pagina a:hover,
+.pestanas-pagina a[aria-current="page"] { background: var(--superficie-2); color: var(--texto); }
+
+.barra-derecha { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+
+/* Origen de la oferta: lo actualiza la integración (verde = SIIAU, ámbar = respaldo) */
+.estado-fuente {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: 12px;
+  color: var(--texto-2);
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  padding: .2rem .65rem;
+  white-space: nowrap;
+}
+.estado-fuente .luz {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--texto-3);
+}
+.estado-fuente[data-fuente="siiau"] .luz {
+  background: var(--exito);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--exito) 20%, transparent);
+}
+.estado-fuente[data-fuente="respaldo"] .luz {
+  background: var(--materia-4);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--materia-4) 20%, transparent);
+}
+
+.boton-icono {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--texto-2);
+  background: transparent;
+  border: 1px solid var(--linea);
+  padding: 0;
+}
+.boton-icono:hover { color: var(--texto); background: var(--superficie-2); }
+
+/* El escudo es blanco: en el tema claro se oscurece */
+.escudo { height: 30px; width: auto; opacity: .9; }
+[data-bs-theme="light"] .escudo { filter: invert(1) brightness(.35); }
+
+/* ---------- Tres columnas ----------
+   En escritorio la página ocupa exactamente la pantalla (barra, columnas y pie)
+   y cada columna hace scroll por su cuenta: así el horario se queda a la vista
+   mientras se recorren las prioridades para arrastrar una ficha. */
+@media (min-width: 1200px) {
+  body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+}
+
+.app {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--ancho-entrada) minmax(0, 1fr) var(--ancho-prioridades);
+}
+
+.columna {
+  overflow-y: auto;
+  padding: 1.25rem 1.25rem 2rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--linea-fuerte) transparent;
+}
+.columna + .columna { border-left: 1px solid var(--linea); }
+
+.columna-centro { background: var(--superficie); padding: 1.25rem 1.5rem 2rem; }
+.columna-centro > * + * { margin-top: 1rem; }
+
+/* En escritorio el offcanvas-lg es una columna normal: se le quita su fondo propio */
+.columna-entrada.offcanvas-lg { background: var(--fondo); }
+.columna-entrada .offcanvas-header { border-bottom: 1px solid var(--linea); }
+
+/* ---------- Pie ---------- */
+.pie {
+  flex: none;
+  padding: .7rem 1.25rem;
+  border-top: 1px solid var(--linea);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem 1.5rem;
+  font-size: 11.5px;
+  color: var(--texto-3);
+}
+.pie a { color: inherit; }
+
+/* Los contenedores se dejan vacíos en el HTML, como pide el contrato. Mientras
+   ningún módulo monte nada, CSS muestra un aviso que desaparece solo. */
+[data-vacio]:empty::before {
+  content: attr(data-vacio);
+  display: block;
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--linea-fuerte);
+  border-radius: 10px;
+  color: var(--texto-3);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* =========================================================================
+   COMPONENTES COMUNES (los pueden usar todos los módulos)
+   ========================================================================= */
+
+/* Título de sección: <h2 class="titulo-seccion"><span class="num">01</span>Ciclo<span class="cuenta">4</span></h2> */
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto);
+  margin: 0 0 .7rem;
+}
+.titulo-seccion .num {
+  font: 500 10.5px var(--mono);
+  color: var(--acento);
+  border: 1px solid color-mix(in srgb, var(--acento) 35%, transparent);
+  border-radius: 6px;
+  padding: .05rem .35rem;
+}
+.titulo-seccion .cuenta { margin-left: auto; font: 500 11px var(--mono); color: var(--texto-3); }
+
+.ayuda { margin: -.3rem 0 1.1rem; color: var(--texto-3); font-size: 12px; }
+.nota  { margin: .45rem 0 0;     color: var(--texto-3); font-size: 11.5px; }
+
+/* Bloque separado por una línea fina, como los pasos del buscador */
+.paso { padding-bottom: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--linea); }
+.paso:last-child { border-bottom: 0; margin-bottom: 0; }
+
+/* Campos: se aplican a los de Bootstrap para no inventar clases nuevas */
+.form-control,
+.form-select {
+  height: 36px;
+  border-radius: 8px;
+  border-color: var(--linea);
+  background-color: var(--superficie);
+  color: var(--texto);
+  font-size: inherit;
+}
+.form-control::placeholder { color: var(--texto-3); }
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--acento-relleno);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acento-relleno) 20%, transparent);
+  background-color: var(--superficie);
+  color: var(--texto);
+}
+
+/* Control segmentado (turno, opción 1/2/3):
+   <div class="segmentado"><button aria-pressed="true">Mañana</button>…</div> */
+.segmentado {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--superficie-2);
+  border-radius: 9px;
+}
+.segmentado > button {
+  flex: 1;
+  padding: .3rem .7rem;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--texto-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.segmentado > button:hover { color: var(--texto); }
+.segmentado > button[aria-pressed="true"] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); }
+
+/* Slider de rango con el acento */
+.form-range::-webkit-slider-thumb { background: var(--acento-relleno); }
+.form-range::-moz-range-thumb     { background: var(--acento-relleno); }
+
+/* Botón principal (Generar). Solo debe haber uno a la vista. */
+.boton {
+  height: 36px;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--acento-relleno);
+  color: var(--sobre-acento);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  transition: transform .15s, filter .15s;
+}
+.boton:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.boton:disabled { opacity: .5; transform: none; }
+
+/* Acción secundaria como enlace subrayado (Copiar NRC, Guardar imagen) */
+.enlace {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-weight: 500;
+  color: var(--texto-2);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--linea-fuerte);
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+.enlace:hover { color: var(--texto); text-decoration-color: currentColor; }
+.enlace.hecho { color: var(--exito); text-decoration: none; }   /* "Copiado" */
+
+/* Insignia con la letra de la materia: <span class="letra" style="--color: var(--materia-1)">A</span> */
+.letra {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 6px;
+  display: inline-grid;
+  place-items: center;
+  font: 600 11px var(--mono);
+  color: var(--color, var(--texto-2));
+  background: color-mix(in srgb, var(--color, var(--texto-3)) 16%, transparent);
+}
+
+/* Aviso de choques o de respaldo */
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .55rem .8rem;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--conflicto);
+  background: color-mix(in srgb, var(--conflicto) 10%, transparent);
+}
+.aviso[hidden] { display: none; }
+
+/* =========================================================================
+   RESPONSIVO
+   ========================================================================= */
+
+/* Tablet: prioridades baja a todo lo ancho, en dos columnas de fichas */
+@media (max-width: 1199.98px) {
+  .app { grid-template-columns: var(--ancho-entrada) minmax(0, 1fr); }
+  .columna { overflow: visible; }
+  .columna-prioridades {
+    grid-column: 1 / -1;
+    border-left: 0 !important;
+    border-top: 1px solid var(--linea);
+  }
+}
+
+/* Móvil: el buscador sale de la retícula y se abre con el botón ≡ */
+@media (max-width: 991.98px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .columna-centro { border-left: 0 !important; overflow-x: auto; padding: 1.25rem 1rem; }
+  .columna-entrada.offcanvas-lg { width: min(var(--ancho-entrada) + 2rem, 88vw); }
+}
+
+@media (max-width: 575.98px) {
+  .barra { gap: .6rem; padding: 0 .9rem; }
+  /* En pantallas angostas la marca queda solo como icono, para que quepan las pestañas */
+  .marca-texto, .estado-fuente, .escudo { display: none; }
+  .pestanas-pagina a { padding: .3rem .5rem; }
+}
