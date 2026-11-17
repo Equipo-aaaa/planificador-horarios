@@ -39,7 +39,10 @@ export default async (peticion) => {
     cup: CENTRO_CUCEI,
     majrp: carrera,
     crsep: esClave ? texto.toUpperCase() : "",
-    materiap: esClave ? "" : quitarAcentos(texto).toUpperCase(),
+    // SIIAU solo encuentra nombres que EMPIECEN con el texto. El "%" de
+    // adelante significa "cualquier cosa antes", así "bajo nivel" encuentra
+    // "PROGRAMACION DE BAJO NIVEL".
+    materiap: esClave ? "" : "%" + quitarAcentos(texto).toUpperCase(),
     horaip: "",
     horafp: "",
     edifp: "",
