@@ -12,3 +12,5 @@ export {
   crearOpcion,
   compararOpciones,
 } from './puntaje.js';
+export { cotaOptimista, debePodar } from './cota.js';
+export { construirProblema, editarOpcion } from './problema.js';
