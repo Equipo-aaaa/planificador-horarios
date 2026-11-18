@@ -8,7 +8,7 @@ Aplicación web que **genera opciones de horario sin empalmes** para estudiantes
 
 Objetivo general: implementar un sistema web que genere automáticamente opciones de horario que eviten empalmes para los estudiantes de CUCEI, a partir de la oferta académica de SIIAU y de las prioridades y el turno que cada uno elija, y que permita ajustarlas manualmente, con el fin de reducir el tiempo y los errores al armar su horario.
 
-El núcleo algorítmico es un **backtracking con poda** (ramificación y acotamiento) que obtiene las 3 mejores combinaciones. Una **búsqueda exhaustiva** con la misma entrada y salida sirve para comprobar que la poda no descarta buenas opciones y para medir la diferencia de tiempo.
+El núcleo algorítmico es un **backtracking con poda** (ramificación y acotamiento) que obtiene las 3 mejores combinaciones. Una **búsqueda exhaustiva** con la misma entrada y salida sirve para comprobar que la poda no descarta buenas opciones y para medir la diferencia de tiempo. Una **estrategia voraz** (BR-07) es la tercera estrategia de la comparación: muy rápida, pero no siempre da el mejor horario.
 
 ## Repositorio y calendario
 
@@ -21,8 +21,8 @@ El calendario sigue las revisiones del curso: **Checkpoint 1** (semana del 16 al
 | --- | --- | --- |
 | Sprint 1 | jue 12 al mié 18 nov | Página publicada; SIIAU responde desde Netlify y hay respaldo de la oferta; núcleo terminado; la búsqueda exhaustiva (algoritmo base) da el top 3 de los escenarios; ficha y cuadrícula funcionan con los datos de ejemplo (Checkpoint 1) |
 | Sprint 2 | jue 19 al dom 22 nov | Backtracking con poda y sus mejoras, probado contra la exhaustiva; problemas aleatorios y página de análisis con la gráfica; en la app ya se puede buscar, ordenar y generar (Checkpoint 2) |
-| Sprint 3 | lun 23 al dom 29 nov | Flujo completo en la URL pública: buscar, ordenar fichas, generar, editar, copiar NRC y exportar; mediciones con la oferta real; prueba con estudiantes diseñada; código limpio y congelado |
-| Cierre | lun 30 nov al jue 3 dic | Prueba con estudiantes, README y deploy final (entrega final) |
+| Sprint 3 | lun 23 al dom 29 nov | Flujo completo en la URL pública: buscar, ordenar fichas, generar, editar, copiar NRC y exportar; estrategia voraz; mediciones de las tres estrategias con la oferta real; prueba con estudiantes diseñada; código limpio y congelado |
+| Cierre | lun 30 nov al jue 3 dic | Prueba con estudiantes, página del reporte, README, deploy final y presentación (entrega final) |
 
 Las tareas se identifican con las iniciales del responsable y un número: `DI` Diego, `DA` Daniel, `BR` Brayan, `AN` Andrés y `TO` todos (por ejemplo, `BR-02`). Cada quien avanza según la fecha de sus tareas en el backlog; el número del ID no siempre sigue ese orden. El detalle de cada tarea está en `docs/backlog.md`; al ayudar con una tarea, revisa ahí su fecha, su Definition of Done y su "Depende de". Una tarea no se empieza hasta que las de su "Depende de" estén en `main`, o se trabaja con los datos de `ejemplos/` mientras tanto.
 
@@ -61,7 +61,7 @@ Los contratos son acuerdos sobre qué datos se pasan entre partes. Son como el e
 | `docs/modelo-datos.md` | Forma de la oferta, las preferencias, el `Problema`, la `Opcion`, el `ResultadoBusqueda` y lo que se guarda en el navegador |
 | `docs/reglas-horario.md` | Empalme, conflictos, turno, huecos, costo, cómo se comparan opciones, **desempate**, cota optimista, poda y estadísticas |
 | `docs/contrato-modulos.md` | Firma de cada función exportada, API HTTP, contenedores de la página, flujo de integración y demos |
-| `docs/backlog.md` | Las 37 tareas con descripción, responsable, sprint, fecha, dependencias y Definition of Done |
+| `docs/backlog.md` | Las 41 tareas con descripción, responsable, sprint, fecha, dependencias y Definition of Done |
 
 Datos de ejemplo verificados con una implementación de referencia: `ejemplos/oferta-ejemplo.json` (4 materias inventadas, 36 combinaciones) y tres escenarios con sus preferencias y su resultado esperado; `escenario-1-todas.json` trae las 36 combinaciones con su puntaje.
 
@@ -82,7 +82,7 @@ planificador-horarios/
 ├── netlify/functions/         ciclos, oferta (Daniel)
 ├── js/
 │   ├── nucleo/                Modelo, empalmes, puntaje, cota (Diego)
-│   ├── algoritmo/             Backtracking, exhaustiva, problemas aleatorios (Brayan)
+│   ├── algoritmo/             Backtracking, exhaustiva, voraz, problemas aleatorios (Brayan)
 │   ├── vista/                 Ficha, listas, cuadrícula, gráfica (Andrés)
 │   ├── entrada/               Oferta, panel de entrada, exportar (Daniel)
 │   ├── analisis/              Página de análisis (Andrés)
