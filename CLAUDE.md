@@ -15,15 +15,16 @@ El núcleo algorítmico es un **backtracking con poda** (ramificación y acotami
 - Repositorio: `Equipo-aaaa/planificador-horarios`, independiente de los proyectos anteriores.
 - Tablero: "Planificador" en GitHub Projects, con una issue por tarea del backlog.
 
-El código se termina el **martes 17 de noviembre de 2026** en la noche, para la revisión de avances (17 al 20 de noviembre). Después solo quedan correcciones, la prueba con estudiantes y los documentos.
+El calendario sigue las revisiones del curso: **Checkpoint 1** (semana del 16 al 19 de noviembre de 2026), **Checkpoint 2** (semana del 23 al 26 de noviembre) y **entrega final** (semana del 30 de noviembre al 4 de diciembre). El código queda congelado el **domingo 29 de noviembre**; en el Cierre solo quedan correcciones, la prueba con estudiantes, el README y el deploy final.
 
 | Etapa | Fechas | Al cerrar |
 | --- | --- | --- |
-| Sprint 1 | jue 12 al sáb 14 nov | Página publicada; SIIAU responde desde Netlify; núcleo terminado; el backtracking da el top 3 de los escenarios; cuadrícula y listas funcionan con los datos de ejemplo |
-| Sprint 2 | dom 15 al mar 17 nov | Flujo completo en la URL pública: buscar, ordenar fichas, generar, editar, copiar NRC y exportar; página de análisis con la gráfica |
-| Cierre | mié 18 al vie 20 nov | Prueba con estudiantes, limpieza, README y deploy final |
+| Sprint 1 | jue 12 al mié 18 nov | Página publicada; SIIAU responde desde Netlify y hay respaldo de la oferta; núcleo terminado; la búsqueda exhaustiva (algoritmo base) da el top 3 de los escenarios; ficha y cuadrícula funcionan con los datos de ejemplo (Checkpoint 1) |
+| Sprint 2 | jue 19 al dom 22 nov | Backtracking con poda y sus mejoras, probado contra la exhaustiva; problemas aleatorios y página de análisis con la gráfica; en la app ya se puede buscar, ordenar y generar (Checkpoint 2) |
+| Sprint 3 | lun 23 al dom 29 nov | Flujo completo en la URL pública: buscar, ordenar fichas, generar, editar, copiar NRC y exportar; mediciones con la oferta real; prueba con estudiantes diseñada; código limpio y congelado |
+| Cierre | lun 30 nov al jue 3 dic | Prueba con estudiantes, README y deploy final (entrega final) |
 
-Las tareas se identifican con las iniciales del responsable y un número: `DI` Diego, `DA` Daniel, `BR` Brayan, `AN` Andrés y `TO` todos (por ejemplo, `BR-02`). El número sigue el orden de las fechas, así que cada quien avanza en orden numérico. El detalle de cada tarea está en `docs/backlog.md`; al ayudar con una tarea, revisa ahí su Definition of Done y su "Depende de". Una tarea no se empieza hasta que las de su "Depende de" estén en `main`, o se trabaja con los datos de `ejemplos/` mientras tanto.
+Las tareas se identifican con las iniciales del responsable y un número: `DI` Diego, `DA` Daniel, `BR` Brayan, `AN` Andrés y `TO` todos (por ejemplo, `BR-02`). Cada quien avanza según la fecha de sus tareas en el backlog; el número del ID no siempre sigue ese orden. El detalle de cada tarea está en `docs/backlog.md`; al ayudar con una tarea, revisa ahí su fecha, su Definition of Done y su "Depende de". Una tarea no se empieza hasta que las de su "Depende de" estén en `main`, o se trabaja con los datos de `ejemplos/` mientras tanto.
 
 ## Qué hace la app
 
@@ -60,7 +61,7 @@ Los contratos son acuerdos sobre qué datos se pasan entre partes. Son como el e
 | `docs/modelo-datos.md` | Forma de la oferta, las preferencias, el `Problema`, la `Opcion`, el `ResultadoBusqueda` y lo que se guarda en el navegador |
 | `docs/reglas-horario.md` | Empalme, conflictos, turno, huecos, costo, cómo se comparan opciones, **desempate**, cota optimista, poda y estadísticas |
 | `docs/contrato-modulos.md` | Firma de cada función exportada, API HTTP, contenedores de la página, flujo de integración y demos |
-| `docs/backlog.md` | Las 37 tareas con descripción, responsable, fecha, dependencias y Definition of Done |
+| `docs/backlog.md` | Las 37 tareas con descripción, responsable, sprint, fecha, dependencias y Definition of Done |
 
 Datos de ejemplo verificados con una implementación de referencia: `ejemplos/oferta-ejemplo.json` (4 materias inventadas, 36 combinaciones) y tres escenarios con sus preferencias y su resultado esperado; `escenario-1-todas.json` trae las 36 combinaciones con su puntaje.
 
