@@ -1,17 +1,17 @@
 # Backlog — planificador-horarios
 
-Actualizado el 17/11/2026. Si cambia una tarea, se actualiza aquí y en su issue.
+Actualizado el 17/11/2026 (se agregaron BR-07, AN-09, DI-11 y TO-03). Si cambia una tarea, se actualiza aquí y en su issue.
 
 ## Calendario
 
-Las etapas siguen las revisiones del curso: Checkpoint 1 (semana del 16 al 19 de noviembre), Checkpoint 2 (semana del 23 al 26 de noviembre) y entrega final (semana del 30 de noviembre al 4 de diciembre). Cada sprint cierra antes o durante su semana de revisión, para llegar con su objetivo cumplido. Son 37 tareas en un repositorio nuevo, independiente de VisuAlgoritmos y de Huffman. Cada tarea es un PR que se prueba solo con su demo o sus pruebas.
+Las etapas siguen las revisiones del curso: Checkpoint 1 (semana del 16 al 19 de noviembre), Checkpoint 2 (semana del 23 al 26 de noviembre) y entrega final (semana del 30 de noviembre al 4 de diciembre). Cada sprint cierra antes o durante su semana de revisión, para llegar con su objetivo cumplido. Son 41 tareas en un repositorio nuevo, independiente de VisuAlgoritmos y de Huffman. Cada tarea es un PR que se prueba solo con su demo o sus pruebas.
 
 | Etapa | Fechas | Hito al cerrar |
 | --- | --- | --- |
 | Sprint 1 | jue 12 al mié 18 nov | Página publicada; SIIAU responde desde Netlify y hay respaldo de la oferta; núcleo terminado; la búsqueda exhaustiva (algoritmo base) da el top 3 de los escenarios de ejemplo; la ficha y la cuadrícula funcionan con los datos de ejemplo. Se presenta en el Checkpoint 1 |
 | Sprint 2 | jue 19 al dom 22 nov | Backtracking con poda (segunda técnica) y sus mejoras, probado contra la exhaustiva; problemas aleatorios y página de análisis con la gráfica para la comparación preliminar; en la app ya se puede buscar, ordenar y generar. Se presenta en el Checkpoint 2 |
-| Sprint 3 | lun 23 al dom 29 nov | Flujo completo en la URL pública: buscar materias, ordenar fichas, generar, editar, copiar NRC y exportar; mediciones con la oferta real; prueba con estudiantes diseñada; código limpio y congelado |
-| Cierre | lun 30 nov al jue 3 dic | Prueba con estudiantes, README y deploy final para la entrega |
+| Sprint 3 | lun 23 al dom 29 nov | Flujo completo en la URL pública: buscar materias, ordenar fichas, generar, editar, copiar NRC y exportar; estrategia voraz como tercera estrategia; mediciones de las tres estrategias con la oferta real; prueba con estudiantes diseñada; código limpio y congelado |
+| Cierre | lun 30 nov al jue 3 dic | Prueba con estudiantes, página del reporte, README, deploy final y presentación para la entrega |
 
 Todo vive en el repositorio Equipo-aaaa/planificador-horarios. Cada integrante trabaja solo en su parte y respeta los tres contratos (modelo de datos, reglas del horario y módulos). Diego y Daniel revisan y aprueban los PR de todos, incluidos los propios.
 
@@ -422,7 +422,7 @@ Al cerrar el domingo 22, el backtracking con poda da exactamente el mismo top 3 
 
 ## Sprint 3 — Flujo completo e integración (23 al 29 nov)
 
-Al cerrar el domingo 29, el flujo completo funciona en la URL pública, las mediciones con la oferta real están en una tabla, la prueba con estudiantes está diseñada y el código queda limpio y congelado. Diego integra cada PR en cuanto se aprueba, así que DI-09 solo conecta lo que falte.
+Al cerrar el domingo 29, el flujo completo funciona en la URL pública, la estrategia voraz está lista como tercera estrategia, las mediciones de las tres estrategias con la oferta real están en una tabla, la prueba con estudiantes está diseñada y el código queda limpio y congelado. Diego integra cada PR en cuanto se aprueba, así que DI-09 solo conecta lo que falte.
 
 ### AN-04 · Descartar, recuperar y fijar fichas
 
@@ -456,6 +456,24 @@ Al cerrar el domingo 29, el flujo completo funciona en la URL pública, las medi
 - Los turnos fijos mueven el slider a su rango
 - Código subido, con PR revisado y sin errores
 
+### BR-07 · Estrategia voraz
+
+**¿Qué se hará?** Programar una tercera estrategia, voraz, que recorre las materias una por una y elige para cada una la sección de mejor rango que no choque con las ya elegidas; si todas chocan, elige la de menor costo. No regresa a corregir decisiones, así que es mucho más rápida que las otras dos pero no siempre encuentra el mejor horario. Recibe el mismo Problema y devuelve el mismo ResultadoBusqueda que las otras búsquedas, con una sola opción.
+
+**¿Quién lo hará?** Brayan
+
+**¿Cuándo se hará?** Sprint 3 (Del 23/11/2026 al 29/11/2026), a más tardar el 23/11/2026
+
+**Depende de:** BR-04
+
+**Definition of Done:**
+
+- La firma buscarVoraz(problema) está en contrato-modulos.md (Diego actualiza el documento antes de integrar el código)
+- Devuelve un ResultadoBusqueda con el formato del contrato, con sus nodos y su tiempo
+- Las pruebas en Node comparan su opción contra la mejor de la exhaustiva en los 3 escenarios y en al menos 200 problemas aleatorios, y reportan en cuántos da el óptimo
+- El PR muestra al menos un caso en el que la voraz no da el mejor horario, con la explicación de por qué
+- Código subido, con PR revisado y sin errores
+
 ### DI-08 · Guardar el avance
 
 **¿Qué se hará?** Guardar en el navegador las materias agregadas, las preferencias y la última opción cada vez que cambian, y restaurarlas al abrir la página, para que el estudiante no pierda su trabajo al recargar.
@@ -474,18 +492,19 @@ Al cerrar el domingo 29, el flujo completo funciona en la URL pública, las medi
 
 ### BR-06 · Medir con la oferta real
 
-**¿Qué se hará?** Medir el tiempo y los nodos de las dos búsquedas con problemas armados de la oferta real, de 2 a 8 materias, y registrar los resultados en una tabla para el README y la evaluación del proyecto.
+**¿Qué se hará?** Medir el tiempo y los nodos de las tres estrategias (exhaustiva, backtracking y voraz) con problemas armados de la oferta real, de 2 a 8 materias, y registrar los resultados en una tabla para el README, la página del reporte y la evaluación del proyecto.
 
 **¿Quién lo hará?** Brayan
 
 **¿Cuándo se hará?** Sprint 3 (Del 23/11/2026 al 29/11/2026), a más tardar el 24/11/2026
 
-**Depende de:** BR-05, DA-06
+**Depende de:** BR-05, BR-07, DA-06
 
 **Definition of Done:**
 
 - Tabla con materias, combinaciones posibles, nodos y tiempo de cada búsqueda
 - Con 8 materias el backtracking responde en menos de un segundo
+- La tabla indica en cuántos problemas la voraz dio el mismo horario que el backtracking
 - La tabla está lista para pegarse en el README
 
 ### AN-06 · Edición manual del horario
@@ -519,6 +538,22 @@ Al cerrar el domingo 29, el flujo completo funciona en la URL pública, las medi
 
 - El texto copiado tiene un NRC por línea en el orden de las materias
 - La imagen descargada muestra la cuadrícula completa y legible
+- Código subido, con PR revisado y sin errores
+
+### AN-09 · Agregar la voraz a la página de análisis
+
+**¿Qué se hará?** Agregar la estrategia voraz a la página de análisis y a la gráfica de tiempos, para comparar las tres estrategias con los mismos problemas aleatorios, y mostrar en cuántos de ellos la voraz encontró el mismo horario que el backtracking.
+
+**¿Quién lo hará?** Andrés
+
+**¿Cuándo se hará?** Sprint 3 (Del 23/11/2026 al 29/11/2026), a más tardar el 26/11/2026
+
+**Depende de:** AN-07, BR-07
+
+**Definition of Done:**
+
+- La gráfica tiene una línea por estrategia: exhaustiva, backtracking y voraz
+- La página muestra el porcentaje de problemas en los que la voraz dio el óptimo
 - Código subido, con PR revisado y sin errores
 
 ### DI-09 · Integración completa
@@ -570,7 +605,7 @@ Al cerrar el domingo 29, el flujo completo funciona en la URL pública, las medi
 
 ## Cierre — Evaluación y entrega (30 nov al 3 dic)
 
-Del lunes 30 en adelante no se agregan funciones: se aplican las correcciones del profesor, se prueba con estudiantes, se documenta y se publica la versión final.
+Del lunes 30 en adelante no se agregan funciones: se aplican las correcciones del profesor, se prueba con estudiantes, se publican el reporte y la versión final y se prepara la presentación.
 
 ### TO-02 · Aplicar la prueba con estudiantes
 
@@ -587,6 +622,23 @@ Del lunes 30 en adelante no se agregan funciones: se aplican las correcciones de
 - Cada integrante aplicó la prueba al menos a 2 estudiantes
 - Los tiempos y las respuestas están en una tabla lista para el README
 
+### DI-11 · Página del reporte
+
+**¿Qué se hará?** Armar en el mismo sitio de Netlify la página pública del reporte que pide la entrega final: el problema y los integrantes, las tres estrategias, la metodología experimental (casos de prueba y métricas), los resultados con gráficas y tablas, la comparación con conclusiones respaldadas por los resultados, los enlaces al repositorio y a la app, y las evidencias del desarrollo (avances, pruebas e historial de cambios).
+
+**¿Quién lo hará?** Diego
+
+**¿Cuándo se hará?** Cierre (Del 30/11/2026 al 03/12/2026), a más tardar el 01/12/2026
+
+**Depende de:** BR-06, AN-09, TO-02
+
+**Definition of Done:**
+
+- La página está publicada y se abre sin iniciar sesión
+- Tiene todo el contenido mínimo que piden las instrucciones del proyecto
+- Las conclusiones dicen cuándo conviene cada estrategia, con base en las mediciones
+- Código subido, con PR revisado y sin errores
+
 ### DI-10 · README
 
 **¿Qué se hará?** Escribir el README del proyecto: qué problema resuelve, cómo se usa, cómo está organizado, cómo funciona el backtracking con poda, los resultados de las mediciones y de la prueba con estudiantes, y la declaración de uso de IA.
@@ -601,6 +653,7 @@ Del lunes 30 en adelante no se agregan funciones: se aplican las correcciones de
 
 - Incluye la tabla de mediciones y la de la prueba con estudiantes
 - Incluye capturas de la página principal y de la de análisis
+- Enlaza la página del reporte
 - Código subido, con PR revisado y sin errores
 
 ### DA-11 · Revisión final y deploy
@@ -611,22 +664,38 @@ Del lunes 30 en adelante no se agregan funciones: se aplican las correcciones de
 
 **¿Cuándo se hará?** Cierre (Del 30/11/2026 al 03/12/2026), a más tardar el 03/12/2026
 
-**Depende de:** TO-01, DI-10
+**Depende de:** TO-01, DI-10, DI-11
 
 **Definition of Done:**
 
 - La URL pública funciona en escritorio y en un teléfono, con el flujo completo
 - Existe el tag v1.0 en main
 
+### TO-03 · Presentación final
+
+**¿Qué se hará?** Preparar y ensayar la presentación final de 7 a 10 minutos: problema, las tres estrategias, resultados de las mediciones y de la prueba con estudiantes, conclusiones y una demo en vivo de la app publicada.
+
+**¿Quién lo hará?** Todos
+
+**¿Cuándo se hará?** Cierre (Del 30/11/2026 al 03/12/2026), a más tardar el 03/12/2026
+
+**Depende de:** DI-11
+
+**Definition of Done:**
+
+- Las diapositivas están listas y cada integrante presenta su parte
+- Se ensayó al menos una vez completa y dura entre 7 y 10 minutos
+- La demo en vivo funciona; si falla la red, hay capturas de respaldo
+
 ## Reparto
 
 | Integrante | Tareas | Parte |
 | --- | --- | --- |
 | Daniel | DA-01 a DA-11 (11) | Repositorio, Netlify, SIIAU, respaldo, panel de entrada, turno, copiar NRC y exportar; revisa y aprueba PR |
-| Diego | DI-01 a DI-10 (10) | Contratos, núcleo (empalmes, puntaje, cota), esqueleto, generar opciones, guardar avance, integración y README; revisa y aprueba PR |
-| Andrés | AN-01 a AN-08 (8) | Ficha, cuadrícula, listas de prioridad, edición manual, gráfica, página de análisis y diseño de la prueba con estudiantes |
-| Brayan | BR-01 a BR-06 (6) | Búsqueda exhaustiva, backtracking con poda, pruebas, mejoras de poda y mediciones |
-| Todos | TO-01 y TO-02 (2) | Limpieza y prueba con estudiantes |
+| Diego | DI-01 a DI-11 (11) | Contratos, núcleo (empalmes, puntaje, cota), esqueleto, generar opciones, guardar avance, integración, README y página del reporte; revisa y aprueba PR |
+| Andrés | AN-01 a AN-09 (9) | Ficha, cuadrícula, listas de prioridad, edición manual, gráfica, página de análisis (con las tres estrategias) y diseño de la prueba con estudiantes |
+| Brayan | BR-01 a BR-07 (7) | Búsqueda exhaustiva, backtracking con poda, pruebas, mejoras de poda, estrategia voraz y mediciones |
+| Todos | TO-01 a TO-03 (3) | Limpieza, prueba con estudiantes y presentación final |
 
 Daniel y Andrés tienen más tareas porque varias son pequeñas; las de Brayan son menos pero las más difíciles en lo conceptual.
 
@@ -636,7 +705,7 @@ Una issue por tarea en el tablero "Planificador", ligado al repo planificador-ho
 
 - **Título:** ID y nombre, por ejemplo BR-02 · Backtracking con poda.
 - **Cuerpo:** ¿Qué se hará?, la Definition of Done como casillas - [ ] y una línea "Depende de: #n".
-- **Assignee:** el responsable; TO-01 y TO-02 se asignan a los cuatro.
+- **Assignee:** el responsable; TO-01, TO-02 y TO-03 se asignan a los cuatro.
 - **Sprint** (campo Iteration): Sprint 1 del 12 al 18 nov, Sprint 2 del 19 al 22 nov, Sprint 3 del 23 al 29 nov y Cierre del 30 nov al 3 dic.
 - **Fecha** (campo Date): la de "a más tardar".
 - **Etiquetas:** opcionales, por ejemplo una por parte del proyecto (núcleo, algoritmo, SIIAU, vista, interfaz).
