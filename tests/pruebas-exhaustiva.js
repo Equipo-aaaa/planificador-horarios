@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buscarExhaustiva } from '../js/algoritmo/exhaustiva.js';
-import { construirProblema, evaluar } from '../js/algoritmo/nucleo-provisional.js';
+import { construirProblema, evaluar } from '../js/nucleo/index.js';
 
 const leer = (ruta) => JSON.parse(readFileSync(new URL(`../ejemplos/${ruta}`, import.meta.url)));
 

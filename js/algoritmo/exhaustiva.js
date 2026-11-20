@@ -1,4 +1,4 @@
-import { crearOpcion, compararOpciones } from './nucleo-provisional.js';
+import { crearOpcion, compararOpciones } from '../nucleo/index.js';
 
 function insertarEnTop(top, opcion, k) {
   let posicion = top.length;
