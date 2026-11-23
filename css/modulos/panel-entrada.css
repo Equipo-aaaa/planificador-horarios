@@ -1,0 +1,51 @@
+/* Panel de entrada (Daniel) · js/entrada/panel.js
+   Usa las variables y componentes de css/estilos.css (.paso, .titulo-seccion,
+   .nota, .aviso, .letra, .boton-icono), así funciona en tema claro y oscuro. */
+
+/* Buscador con la lupa dentro del campo */
+.panel-entrada__buscador { position: relative; }
+.panel-entrada__buscador .bi-search {
+  position: absolute;
+  left: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--texto-3);
+  pointer-events: none; /* que el clic pase al campo */
+}
+.panel-entrada__buscador .form-control { padding-left: 2rem; }
+
+/* Resultados y agregadas comparten el mismo renglón */
+.panel-entrada__lista { list-style: none; margin: .6rem 0 0; padding: 0; }
+.panel-entrada__lista:empty { display: none; }
+.panel-entrada__lista li {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .45rem .5rem;
+  margin: 0 -.5rem;
+  border-radius: 8px;
+}
+.panel-entrada__lista li:hover { background: var(--superficie-2); }
+
+.panel-entrada__nombre { line-height: 1.25; min-width: 0; }
+.panel-entrada__nombre small { display: block; font-size: 11px; color: var(--texto-3); }
+
+.panel-entrada__boton { margin-left: auto; flex: none; }
+.panel-entrada__boton:disabled { color: var(--exito); opacity: 1; cursor: default; background: none; }
+
+/* El botón de quitar solo aparece al pasar el mouse, como en la maqueta.
+   En pantallas táctiles no hay "hover", así que ahí se queda visible. */
+@media (hover: hover) {
+  .panel-entrada__quitar { opacity: 0; transition: opacity .15s; }
+  .panel-entrada__lista li:hover .panel-entrada__quitar,
+  .panel-entrada__quitar:focus-visible { opacity: 1; }
+}
+.panel-entrada__quitar:hover { color: var(--conflicto); }
+
+/* Aviso de respaldo: no es un error, así que usa el ámbar de "respaldo" de la
+   barra superior (.estado-fuente) en lugar del rojo de los choques. */
+.panel-entrada__respaldo {
+  color: var(--texto-2);
+  background: color-mix(in srgb, var(--materia-4) 14%, transparent);
+}
+.panel-entrada__respaldo .bi { color: var(--materia-4); }
