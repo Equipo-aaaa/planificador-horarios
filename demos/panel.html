@@ -10,12 +10,18 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="../css/estilos.css" rel="stylesheet">
   <link href="../css/modulos/panel-entrada.css" rel="stylesheet">
+  <!-- estilos.css fija el body al alto de la pantalla y le quita el scroll
+       (en index.html cada columna hace scroll por su cuenta). Esta demo no
+       tiene columnas, así que le regresamos el scroll normal. -->
+  <style>
+    body { height: auto; display: block; overflow: auto; }
+  </style>
 </head>
 <body>
   <main class="container py-4" style="max-width: 760px;">
     <h1 class="h5 mb-1">Panel de entrada</h1>
     <p class="text-secondary small">
-      Busca, agrega y quita materias: cada aviso del panel se imprime en la consola y abajo.
+      Busca, agrega y quita materias, y cambia el turno: cada aviso del panel se imprime en la consola y abajo.
       Con Live Server no existen las funciones de Netlify, así que la búsqueda usa el respaldo
       (prueba "algoritmos" o "IL355"). Con <code>netlify dev</code> consulta SIIAU en vivo.
     </p>
@@ -61,13 +67,18 @@
       alCambiarCiclo: (ciclo) => registrar("alCambiarCiclo", ciclo),
       alAgregarMateria: (materia, respuesta) => registrar("alAgregarMateria", materia, respuesta),
       alQuitarMateria: (clave) => registrar("alQuitarMateria", clave),
+      alCambiarTurno: (turno) => registrar("alCambiarTurno", turno),
     });
 
     // Simula abrir la página con un avance guardado: dos materias de ejemplo.
     document.getElementById("restaurar").addEventListener("click", async () => {
       const oferta = await (await fetch("../ejemplos/oferta-ejemplo.json")).json();
-      panel.establecer({ ciclo: "202620", materias: oferta.materias.slice(0, 2) });
-      salida.textContent = "establecer(): 2 materias de ejemplo (no debe imprimir avisos)\n" + salida.textContent;
+      panel.establecer({
+        ciclo: "202620",
+        materias: oferta.materias.slice(0, 2),
+        turno: { tipo: "personalizado", inicio: 600, fin: 1080 },
+      });
+      salida.textContent = "establecer(): 2 materias de ejemplo y turno de 10:00 a 18:00 (no debe imprimir avisos)\n" + salida.textContent;
     });
 
     document.getElementById("tema").addEventListener("click", () => {
