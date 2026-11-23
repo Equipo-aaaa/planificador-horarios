@@ -1,8 +1,7 @@
 // DA-08 · Panel de entrada
 //
 // Dibuja dentro de un contenedor los pasos del buscador:
-//   01 Ciclo · 02 Buscar materias · 03 Agregadas
-// (el 04 Turno se agrega en DA-09).
+//   01 Ciclo · 02 Buscar materias · 03 Agregadas · 04 Turno
 //
 // Como pide el contrato, el panel NO guarda el estado de la app: solo avisa
 // con callbacks lo que hizo el estudiante, y la integración (Diego) decide qué
@@ -11,6 +10,7 @@
 
 import { obtenerCiclos, buscarMaterias } from "./oferta.js";
 import { textoDescarga } from "../vista/formato.js";
+import { TURNOS } from "../nucleo/index.js";
 
 // Carreras del filtro. "" = sin filtro. Para agregar otra basta una línea más.
 const CARRERAS = [
@@ -24,6 +24,21 @@ const CARRERAS = [
 // orden en que se agregan las materias.
 const NUM_COLORES = 8;
 
+// Botones del turno, en el orden en que se ven. "personalizado" no está en
+// TURNOS del núcleo porque su rango lo decide el slider.
+const BOTONES_TURNO = [
+  ["matutino", "Mañana"],
+  ["vespertino", "Tarde"],
+  ["libre", "Libre"],
+  ["personalizado", "Otro"],
+];
+
+// Límites del slider: los mismos de la cuadrícula (7:00 a 21:00), en minutos,
+// en pasos de 30 minutos como pide DA-09.
+const SLIDER_MIN = 420;
+const SLIDER_MAX = 1260;
+const SLIDER_PASO = 30;
+
 // Con una sola letra SIIAU devuelve cientos de materias y tarda mucho.
 const MIN_LETRAS = 2;
 
@@ -35,6 +50,7 @@ export function montarPanelEntrada(contenedor, opciones = {}) {
     alCambiarCiclo = nada,
     alAgregarMateria = nada,
     alQuitarMateria = nada,
+    alCambiarTurno = nada,
   } = opciones;
 
   // ----- Lo que el panel recuerda para dibujarse -----
@@ -42,6 +58,7 @@ export function montarPanelEntrada(contenedor, opciones = {}) {
   let respuestaActual = null;  // RespuestaOferta de la última búsqueda
   let cicloRestaurado = null;  // ciclo que pidió establecer() antes de que llegaran los ciclos
   let numeroBusqueda = 0;      // para ignorar respuestas viejas (ver buscar())
+  let turno = { ...TURNOS.matutino }; // el mismo que trae por defecto modelo-datos.md
 
   contenedor.innerHTML = `
     <div class="panel-entrada">
@@ -75,6 +92,25 @@ export function montarPanelEntrada(contenedor, opciones = {}) {
         </h2>
         <ul class="panel-entrada__lista" data-ref="agregadas"></ul>
         <p class="nota" data-ref="sin-agregadas">Todavía no agregas materias.</p>
+      </section>
+
+      <section class="paso">
+        <h2 class="titulo-seccion"><span class="num">04</span>Turno</h2>
+        <div class="segmentado panel-entrada__turnos" data-ref="turnos" role="group" aria-label="Turno">
+          ${BOTONES_TURNO.map(([tipo, texto]) =>
+            `<button type="button" data-tipo="${tipo}" aria-pressed="false">${texto}</button>`).join("")}
+        </div>
+        <div class="panel-entrada__riel" data-ref="riel">
+          <div class="panel-entrada__tramo" data-ref="tramo"></div>
+          <input type="range" data-ref="desde" min="${SLIDER_MIN}" max="${SLIDER_MAX}" step="${SLIDER_PASO}"
+                 aria-label="Hora de inicio del turno">
+          <input type="range" data-ref="hasta" min="${SLIDER_MIN}" max="${SLIDER_MAX}" step="${SLIDER_PASO}"
+                 aria-label="Hora de fin del turno">
+        </div>
+        <div class="panel-entrada__marcas mono">
+          <span>7:00</span><span class="panel-entrada__rango" data-ref="rango"></span><span>21:00</span>
+        </div>
+        <p class="nota">Una clase fuera de turno no se descarta: cuenta en contra.</p>
       </section>
     </div>
   `;
@@ -268,15 +304,91 @@ export function montarPanelEntrada(contenedor, opciones = {}) {
     return boton;
   }
 
+  // ----- 04 · Turno -----
+
+  // Botones: los fijos usan el rango de TURNOS; "Otro" toma lo que marque el
+  // slider en ese momento.
+  ref("turnos").addEventListener("click", (evento) => {
+    const boton = evento.target.closest("button[data-tipo]");
+    if (!boton) return;
+    const tipo = boton.dataset.tipo;
+    // Volver a picar el mismo botón no cambia nada: no avisamos otra vez.
+    if (tipo === turno.tipo) return;
+    const nuevo = tipo === "personalizado"
+      ? { tipo, inicio: Number(ref("desde").value), fin: Number(ref("hasta").value) }
+      : { ...TURNOS[tipo] }; // copia: TURNOS está congelado (Object.freeze)
+    cambiarTurno(nuevo);
+  });
+
+  // Slider: son dos <input type="range"> encimados, uno para cada extremo.
+  // "input" se dispara mientras se arrastra: solo redibujamos.
+  // "change" se dispara al soltar: ahí sí avisamos, para no mandar un aviso
+  // por cada paso de 30 minutos.
+  for (const nombre of ["desde", "hasta"]) {
+    ref(nombre).addEventListener("input", () => {
+      separarTopes(nombre);
+      dibujarTurno({ tipo: "personalizado", inicio: Number(ref("desde").value), fin: Number(ref("hasta").value) });
+    });
+    ref(nombre).addEventListener("change", () => {
+      cambiarTurno({ tipo: "personalizado", inicio: Number(ref("desde").value), fin: Number(ref("hasta").value) });
+    });
+  }
+
+  // Los topes no se pueden cruzar: el turno dura al menos un paso (30 min).
+  // Se mueve el que NO está arrastrando el estudiante.
+  function separarTopes(arrastrado) {
+    const desde = ref("desde");
+    const hasta = ref("hasta");
+    if (Number(hasta.value) - Number(desde.value) >= SLIDER_PASO) return;
+    if (arrastrado === "desde") {
+      desde.value = Math.min(Number(desde.value), SLIDER_MAX - SLIDER_PASO);
+      hasta.value = Number(desde.value) + SLIDER_PASO;
+    } else {
+      hasta.value = Math.max(Number(hasta.value), SLIDER_MIN + SLIDER_PASO);
+      desde.value = Number(hasta.value) - SLIDER_PASO;
+    }
+  }
+
+  function cambiarTurno(nuevo) {
+    turno = nuevo;
+    dibujarTurno(turno);
+    alCambiarTurno({ ...turno });
+  }
+
+  // Pinta botones, slider y texto para un turno. El libre (0 a 1440) se sale
+  // del slider, así que lo mostramos de punta a punta.
+  function dibujarTurno({ tipo, inicio, fin }) {
+    for (const boton of ref("turnos").querySelectorAll("button")) {
+      boton.setAttribute("aria-pressed", String(boton.dataset.tipo === tipo));
+    }
+
+    const desde = Math.max(inicio, SLIDER_MIN);
+    const hasta = Math.min(fin, SLIDER_MAX);
+    ref("desde").value = desde;
+    ref("hasta").value = hasta;
+
+    // El tramo de color va de un tope al otro, en porcentaje del riel.
+    const porcentaje = (minutos) => ((minutos - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
+    ref("tramo").style.left = `${porcentaje(desde)}%`;
+    ref("tramo").style.width = `${porcentaje(hasta) - porcentaje(desde)}%`;
+
+    ref("rango").textContent = tipo === "libre" ? "Todo el día" : `${hora(inicio)} – ${hora(fin)}`;
+  }
+
+  // 450 → "7:30". Sin cero a la izquierda, como las marcas 7:00 y 21:00.
+  function hora(minutos) {
+    return `${Math.floor(minutos / 60)}:${String(minutos % 60).padStart(2, "0")}`;
+  }
+
   dibujarAgregadas();
+  dibujarTurno(turno);
 
   // ----- Lo que el panel ofrece hacia fuera -----
 
   return {
     // Restaura el panel al cargar un avance guardado. No llama callbacks:
     // la página ya conoce ese estado, solo lo estamos pintando.
-    // El turno lo usará DA-09.
-    establecer({ ciclo, materias = [] } = {}) {
+    establecer({ ciclo, materias = [], turno: turnoGuardado } = {}) {
       if (ciclo) {
         cicloRestaurado = ciclo;
         if (!ref("ciclo").disabled) ponerCiclo(ciclo);
@@ -284,6 +396,10 @@ export function montarPanelEntrada(contenedor, opciones = {}) {
       agregadas = [...materias];
       dibujarAgregadas();
       dibujarResultados();
+      if (turnoGuardado) {
+        turno = { ...turnoGuardado };
+        dibujarTurno(turno);
+      }
     },
   };
 }

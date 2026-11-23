@@ -49,3 +49,66 @@
   background: color-mix(in srgb, var(--materia-4) 14%, transparent);
 }
 .panel-entrada__respaldo .bi { color: var(--materia-4); }
+
+/* ----- 04 · Turno (DA-09) ----- */
+
+.panel-entrada__turnos { display: flex; width: 100%; }
+
+/* Riel del slider: dos <input type="range"> encimados sobre una barra gris.
+   Los inputs son transparentes y solo se ven sus "topes" (los circulitos). */
+.panel-entrada__riel {
+  position: relative;
+  height: 4px;
+  margin: 1.15rem 0 .45rem;
+  border-radius: 99px;
+  background: var(--superficie-2);
+}
+.panel-entrada__tramo {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 99px;
+  background: var(--acento-relleno);
+}
+.panel-entrada__riel input[type="range"] {
+  position: absolute;
+  inset: 50% 0 auto;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  /* El input entero ignora el mouse; solo su tope lo recibe. Así se puede
+     agarrar el tope de abajo aunque el otro input esté encima. */
+  pointer-events: none;
+}
+.panel-entrada__riel input[type="range"]::-webkit-slider-runnable-track { background: none; }
+.panel-entrada__riel input[type="range"]::-moz-range-track { background: none; }
+.panel-entrada__riel input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--superficie);
+  border: 2px solid var(--acento-relleno);
+  cursor: grab;
+}
+.panel-entrada__riel input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--superficie);
+  border: 2px solid var(--acento-relleno);
+  cursor: grab;
+}
+.panel-entrada__riel input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acento-relleno) 30%, transparent);
+}
+
+.panel-entrada__marcas { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--texto-3); }
+.panel-entrada__rango { color: var(--acento); }
