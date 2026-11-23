@@ -1,7 +1,6 @@
-
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buscarBacktracking } from '../js/algoritmo/backtracking.js';
+import { buscarBacktracking, SIN_MEJORAS } from '../js/algoritmo/backtracking.js';
 import { buscarExhaustiva } from '../js/algoritmo/exhaustiva.js';
 import { construirProblema } from '../js/nucleo/index.js';
 
@@ -20,6 +19,7 @@ for (const n of [1, 2, 3]) {
   const esperado = leer(`escenario-${n}-resultado.json`);
   const problema = construirProblema(oferta.materias, preferencias);
   const bt = buscarBacktracking(problema);
+  const base = buscarBacktracking(problema, 3, SIN_MEJORAS);
   const ex = buscarExhaustiva(problema);
 
   prueba(`escenario ${n}: top 3 idéntico al ejemplo y a la exhaustiva`, () => {
@@ -27,14 +27,14 @@ for (const n of [1, 2, 3]) {
     assert.deepEqual(bt.opciones, ex.opciones);
   });
   prueba(`escenario ${n}: nodos y combinaciones esperados`, () => {
-    assert.equal(bt.estadisticas.nodos, esperado.estadisticas.backtracking.nodos);
-    assert.equal(bt.estadisticas.combinaciones, esperado.estadisticas.backtracking.combinaciones);
+    assert.equal(base.estadisticas.nodos, esperado.estadisticas.backtracking.nodos);
+    assert.equal(base.estadisticas.combinaciones, esperado.estadisticas.backtracking.combinaciones);
   });
 }
 
 prueba('escenario 1: visita menos nodos que la exhaustiva (29 contra 63)', () => {
   const problema = construirProblema(oferta.materias, leer('escenario-1-preferencias.json'));
-  const bt = buscarBacktracking(problema).estadisticas;
+  const bt = buscarBacktracking(problema, 3, SIN_MEJORAS).estadisticas;
   const ex = buscarExhaustiva(problema).estadisticas;
   assert.equal(bt.nodos, 29);
   assert.equal(bt.combinaciones, 7);
@@ -66,7 +66,7 @@ function problemaAlAzar(semilla) {
     const candidatas = [];
     for (let s = 0; s < entero(1, 5); s++) {
       const dias = [entero(0, 5), entero(0, 5)];
-      const inicio = 420 + 30 * entero(0, 26);
+      const inicio = 420 + 30 * entero(0, 26); 
       const duracion = 55 + 30 * entero(0, 2);
       const sesiones = [...new Set(dias)].map((dia) => ({ dia, inicio, fin: inicio + duracion }));
       const nrc = String(200000 + m * 10 + s);
@@ -82,10 +82,11 @@ prueba('300 problemas aleatorios: mismo top 3 que la exhaustiva', () => {
   for (let semilla = 1; semilla <= 300; semilla++) {
     const problema = problemaAlAzar(semilla);
     const bt = buscarBacktracking(problema);
+    const base = buscarBacktracking(problema, 3, SIN_MEJORAS);
     const ex = buscarExhaustiva(problema);
     assert.deepEqual(bt.opciones, ex.opciones, `semilla ${semilla}`);
-    assert.ok(bt.estadisticas.nodos <= ex.estadisticas.nodos, `semilla ${semilla}`);
-    if (bt.estadisticas.nodos < ex.estadisticas.nodos) conPoda++;
+    assert.ok(base.estadisticas.nodos <= ex.estadisticas.nodos, `semilla ${semilla}`);
+    if (base.estadisticas.nodos < ex.estadisticas.nodos) conPoda++;
   }
   assert.ok(conPoda > 0, 'la poda nunca se activó');
 });

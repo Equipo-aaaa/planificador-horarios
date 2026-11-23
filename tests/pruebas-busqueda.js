@@ -1,32 +1,23 @@
+
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { buscarBacktracking } from '../js/algoritmo/backtracking.js';
+import { buscarBacktracking, SIN_MEJORAS } from '../js/algoritmo/backtracking.js';
 import { buscarExhaustiva } from '../js/algoritmo/exhaustiva.js';
 import { generarProblemaAleatorio } from '../js/algoritmo/aleatorio.js';
-import { TURNOS, compararOpciones, construirProblema, seEmpalman } from '../js/nucleo/index.js';
-
-const leer = (ruta) => JSON.parse(readFileSync(new URL(ruta, import.meta.url)));
-const ofertaEjemplo = leer('../ejemplos/oferta-ejemplo.json').materias;
-const ofertaReal = leer('../datos/oferta-202620.json').materias;
+import { compararOpciones, construirProblema, seEmpalman } from '../js/nucleo/index.js';
+import {
+  crearProblemas,
+  leer,
+  nodosDeArbol,
+  ofertaEjemplo,
+  ofertaReal,
+  totalCombinaciones,
+} from './problemas-de-prueba.js';
 
 let pruebas = 0;
 function prueba(nombre, fn) {
   fn();
   pruebas++;
   console.log(`  ok  ${nombre}`);
-}
-
-const totalCombinaciones = (problema) =>
-  problema.materias.reduce((producto, m) => producto * m.candidatas.length, 1);
-
-function nodosEsperadosExhaustiva(problema) {
-  let nodos = 0;
-  let nivel = 1;
-  for (const m of problema.materias) {
-    nivel *= m.candidatas.length;
-    nodos += nivel;
-  }
-  return nodos;
 }
 
 function seccionesDe(problema, opcion) {
@@ -52,18 +43,19 @@ for (const n of [1, 2, 3]) {
   const problema = construirProblema(ofertaEjemplo, preferencias);
   const exhaustiva = buscarExhaustiva(problema);
   const backtracking = buscarBacktracking(problema);
+  const backtrackingBase = buscarBacktracking(problema, 3, SIN_MEJORAS);
 
-  prueba(`escenario ${n}: las dos busquedas dan el top 3 esperado`, () => {
+  prueba(`escenario ${n}: las dos búsquedas dan el top 3 esperado`, () => {
     assert.equal(esperado.opciones.length, 3);
     assert.deepEqual(exhaustiva.opciones, esperado.opciones);
     assert.deepEqual(backtracking.opciones, esperado.opciones);
     assert.deepEqual(backtracking.sinOpciones, esperado.sinOpciones);
   });
 
-  prueba(`escenario ${n}: nodos y combinaciones esperados en cada busqueda`, () => {
+  prueba(`escenario ${n}: nodos y combinaciones esperados en cada búsqueda`, () => {
     for (const [nombre, resultado] of [
       ['exhaustiva', exhaustiva],
-      ['backtracking', backtracking],
+      ['backtracking', backtrackingBase],
     ]) {
       assert.equal(resultado.estadisticas.nodos, esperado.estadisticas[nombre].nodos, nombre);
       assert.equal(
@@ -76,7 +68,7 @@ for (const n of [1, 2, 3]) {
 }
 
 for (const n of [1, 2]) {
-  prueba(`escenario ${n}: tiene solucion sin choques y ninguna opcion tiene empalmes`, () => {
+  prueba(`escenario ${n}: tiene solución sin choques y ninguna opción tiene empalmes`, () => {
     const problema = construirProblema(
       ofertaEjemplo,
       leer(`../ejemplos/escenario-${n}-preferencias.json`)
@@ -94,7 +86,7 @@ for (const n of [1, 2]) {
   });
 }
 
-prueba('escenario 3: no tiene solucion sin choques y lo marca con empalmes', () => {
+prueba('escenario 3: no tiene solución sin choques y lo marca con empalmes', () => {
   const problema = construirProblema(ofertaEjemplo, leer('../ejemplos/escenario-3-preferencias.json'));
   const todas = buscarExhaustiva(problema, 100).opciones;
   assert.ok(todas.every((o) => o.puntaje.conflictos > 0), 'sí había una solución sin choques');
@@ -105,40 +97,6 @@ prueba('escenario 3: no tiene solucion sin choques y lo marca con empalmes', () 
   }
 });
 
-const TOPE_COMBINACIONES = 30000;
-const TURNOS_A_PROBAR = [TURNOS.matutino, TURNOS.vespertino, TURNOS.libre];
-
-function crearProblemas() {
-  const problemas = [];
-
-  for (let semilla = 1; semilla <= 120; semilla++) {
-    const n = 1 + (semilla % ofertaEjemplo.length); 
-    problemas.push({ origen: `ejemplo n=${n} semilla=${semilla}`, problema: generarProblemaAleatorio(n, ofertaEjemplo, semilla) });
-  }
-
-  for (let semilla = 1; problemas.length < 270 && semilla <= 2000; semilla++) {
-    const n = 2 + (semilla % 5); 
-    const problema = generarProblemaAleatorio(n, ofertaReal, semilla);
-    if (totalCombinaciones(problema) > TOPE_COMBINACIONES) continue;
-    problemas.push({ origen: `real n=${n} semilla=${semilla}`, problema });
-  }
-
-  for (let semilla = 1; semilla <= 150; semilla++) {
-    const n = 4 + (semilla % 5); 
-    const completo = generarProblemaAleatorio(n, ofertaReal, 5000 + semilla);
-    const conservar = 1 + (semilla % 3);
-    const problema = {
-      ...completo,
-      materias: completo.materias.map((m) => ({ ...m, candidatas: m.candidatas.slice(0, conservar) })),
-    };
-    problemas.push({ origen: `apretado n=${n} conservar=${conservar} semilla=${5000 + semilla}`, problema });
-  }
-
-  return problemas.map((p, i) => ({
-    ...p,
-    problema: { ...p.problema, turno: { ...TURNOS_A_PROBAR[i % 3] } },
-  }));
-}
 
 const problemas = crearProblemas();
 
@@ -167,13 +125,16 @@ prueba('lo mismo con otros valores de k (1, 2 y 5)', () => {
   }
 });
 
-prueba('las estadisticas cumplen las definiciones de reglas-horario.md', () => {
+prueba('las estadísticas cumplen las definiciones de reglas-horario.md', () => {
   for (const { origen, problema } of problemas) {
     const ex = buscarExhaustiva(problema).estadisticas;
     const bt = buscarBacktracking(problema).estadisticas;
     assert.equal(ex.combinaciones, totalCombinaciones(problema), origen);
-    assert.equal(ex.nodos, nodosEsperadosExhaustiva(problema), origen);
-    assert.ok(bt.nodos <= ex.nodos, origen);
+    assert.equal(ex.nodos, nodosDeArbol(problema.materias.map((m) => m.candidatas.length)), origen);
+    const base = buscarBacktracking(problema, 3, SIN_MEJORAS).estadisticas;
+    assert.ok(base.nodos <= ex.nodos, origen);
+    const conteos = problema.materias.map((m) => m.candidatas.length).sort((a, b) => b - a);
+    assert.ok(bt.nodos <= nodosDeArbol(conteos), origen);
     assert.ok(bt.combinaciones <= ex.combinaciones, origen);
     assert.ok(bt.ms >= 0 && ex.ms >= 0, origen);
   }
@@ -202,7 +163,6 @@ prueba('en todos los problemas, las opciones sin conflictos no tienen empalmes',
   }
 });
 
-
 prueba('los problemas probados son variados: con y sin choques, y con poda', () => {
   let sinChoques = 0;
   let conChoques = 0;
@@ -216,10 +176,10 @@ prueba('los problemas probados son variados: con y sin choques, y con poda', () 
   console.log(`      (sin choques: ${sinChoques}, con choques: ${conChoques}, con poda: ${conPoda})`);
   assert.ok(sinChoques >= 20, `pocos problemas sin choques (${sinChoques})`);
   assert.ok(conChoques >= 20, `pocos problemas con choques (${conChoques})`);
-  assert.ok(conPoda >= 50, `la poda se activo pocas veces (${conPoda})`);
+  assert.ok(conPoda >= 50, `la poda se activó pocas veces (${conPoda})`);
 });
 
-prueba('materias sin opciones: las dos busquedas conservan sinOpciones', () => {
+prueba('materias sin opciones: las dos búsquedas conservan sinOpciones', () => {
   const base = generarProblemaAleatorio(3, ofertaReal, 5);
   const problema = { ...base, sinOpciones: ['IL999'] };
   const ex = buscarExhaustiva(problema);
