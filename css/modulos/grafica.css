@@ -1,0 +1,50 @@
+.grafica {
+  --grafica-borde: var(--color-borde, #d5d9e0);
+  --grafica-texto: var(--color-texto, #1f2933);
+  --grafica-suave: var(--color-texto-suave, #5f6b7a);
+
+  color: var(--grafica-texto);
+}
+
+.grafica__barra {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.grafica__aviso {
+  color: var(--grafica-suave);
+  margin: 0;
+}
+
+.grafica__paneles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: 1rem;
+}
+
+.grafica__barra[hidden],
+.grafica__paneles[hidden],
+.grafica__aviso[hidden] {
+  display: none;
+}
+
+.grafica__panel {
+  border: 1px solid var(--grafica-borde);
+  border-radius: 8px;
+  padding: 0.75rem;
+  min-width: 0;
+}
+
+.grafica__titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.grafica__lienzo {
+  position: relative;
+  height: 18rem;
+}
