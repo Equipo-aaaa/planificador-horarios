@@ -14,7 +14,8 @@
   <main class="container py-4" style="max-width: 640px;">
     <h1 class="h4 mb-1">Listas de prioridad</h1>
     <p class="text-secondary">
-      Escenario 1. Arrastra las fichas desde el asa para reordenarlas: cada cambio
+      Escenario 1. Arrastra las fichas desde el asa para reordenarlas, fíjalas con el pin
+      o descártalas con la X (y recupéralas desde la zona de descartadas). Cada cambio
       imprime en la consola las preferencias nuevas y las muestra abajo.
     </p>
 
@@ -28,7 +29,7 @@
     <p id="error" class="text-danger mt-3" hidden></p>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
   <script type="module">
     import { montarListasPrioridad } from "../js/vista/listas.js";
 
@@ -61,7 +62,7 @@
         alCambiar: (nuevas) => {
           console.log("alCambiar", nuevas);
           salida.textContent = nuevas.materias
-            .map((p) => `${p.clave}: [${p.orden.join(", ")}]`)
+            .map((p) => `${p.clave}: orden [${p.orden.join(", ")}] · descartadas [${p.descartadas.join(", ")}] · fijada ${p.fijada ?? "ninguna"}`)
             .join("\n");
         },
       });
