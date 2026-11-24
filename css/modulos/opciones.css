@@ -1,0 +1,69 @@
+/* DI-07 · Barra de opciones (#opciones): pestañas, Generar, puntaje y avisos.
+   Usa los componentes comunes de estilos.css (.segmentado, .boton, .aviso, .nota)
+   y solo agrega lo propio. Sigue la maqueta de docs/propuesta-diseno.html. */
+
+#opciones.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--linea);
+}
+
+/* Pestañas a la izquierda, Generar a la derecha; en pantallas angostas bajan */
+.opciones__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem 1rem;
+}
+.opciones__generar { margin-left: auto; }
+
+/* Mientras no hay opciones el grupo de pestañas no ocupa lugar */
+.opciones__pestanas:empty { display: none; }
+.opciones__pestanas > button {
+  padding: .4rem .75rem;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+.opciones__punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--exito);
+}
+.opciones__punto--mal { background: var(--conflicto); }
+
+/* Resumen del puntaje: etiqueta pequeña y cifra en mono, separados por líneas */
+.opciones__metricas { display: flex; flex-wrap: wrap; row-gap: .4rem; }
+.opciones__metricas[hidden] { display: none; }
+.opciones__metrica {
+  display: flex;
+  align-items: baseline;
+  gap: .45rem;
+  padding: 0 .85rem;
+  border-left: 1px solid var(--linea);
+}
+.opciones__metrica:first-child { border-left: 0; padding-left: 0; }
+.opciones__metrica span { font-size: 12px; color: var(--texto-3); }
+.opciones__metrica b { font-size: 14px; font-weight: 600; }
+.opciones__metrica b.mal { color: var(--conflicto); }
+.opciones__metrica b.bien { color: var(--exito); }
+
+.opciones__vacio { margin: 0; color: var(--texto-3); font-size: 12.5px; }
+.opciones__vacio[hidden] { display: none; }
+
+/* .aviso es rojo (choques). Estos no son errores: piden volver a generar o
+   explican por qué la cuadrícula está vacía. */
+.opciones__desactualizado,
+.opciones__info {
+  margin: 0;
+  color: var(--acento);
+  background: color-mix(in srgb, var(--acento) 10%, transparent);
+}
+
+.opciones__estadisticas { margin: 0; }
+.opciones__estadisticas:empty { display: none; }
