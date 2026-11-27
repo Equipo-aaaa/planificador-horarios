@@ -1,11 +1,11 @@
 import { minutosAHora } from "./formato.js";
+import { GRUPO_FICHAS } from "./arrastre.js";
 
 const INICIO_DIA = 7 * 60;
 const FIN_DIA = 21 * 60;
 const TOTAL_MINUTOS = FIN_DIA - INICIO_DIA;
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
 const NUM_COLORES = 8;
 
 function crear(etiqueta, clase, texto) {
@@ -15,7 +15,6 @@ function crear(etiqueta, clase, texto) {
   return elemento;
 }
 
-// Convierte un rango de minutos en porcentajes de la altura de la columna.
 export function posicionVertical(inicio, fin) {
   const desde = Math.max(inicio, INICIO_DIA);
   const hasta = Math.min(fin, FIN_DIA);
@@ -28,8 +27,8 @@ export function posicionVertical(inicio, fin) {
 export function repartirCarriles(sesiones) {
   const ordenadas = [...sesiones].sort((a, b) => a.inicio - b.inicio || a.fin - b.fin);
   const resultado = [];
-  let grupo = [];       
-  let finPorCarril = []; 
+  let grupo = [];
+  let finPorCarril = [];
 
   const cerrarGrupo = () => {
     for (const sesion of grupo) sesion.carriles = finPorCarril.length;
@@ -83,20 +82,12 @@ function crearEmpalme(empalme) {
   return marca;
 }
 
-/**
- * Dibuja el horario semanal dentro de `contenedor`.
- *
- * @param {HTMLElement} contenedor 
- * @param {Object} opciones         
- * @returns {{ mostrar(opcion, materias): void, limpiar(): void }}
- */
 export function montarCuadricula(contenedor, opciones = {}) {
   const { alEditar } = opciones;
 
   contenedor.replaceChildren();
   contenedor.classList.add("cuadricula");
 
-  // encabezado con los días, columna de horas y una columna por día.
   const tabla = crear("div", "cuadricula__tabla");
   tabla.append(crear("div", "cuadricula__esquina"));
   for (const dia of DIAS) tabla.append(crear("div", "cuadricula__dia", dia));
@@ -115,6 +106,22 @@ export function montarCuadricula(contenedor, opciones = {}) {
     return columna;
   });
   contenedor.append(tabla);
+
+  if (alEditar) {
+    if (typeof Sortable === "undefined") {
+      throw new Error("Falta cargar SortableJS antes de montar la cuadrícula con alEditar");
+    }
+    Sortable.create(contenedor, {
+      group: { name: GRUPO_FICHAS, pull: false, put: true },
+      sort: false,
+      draggable: ".cuadricula__sin-arrastre",
+      onAdd: (evento) => {
+        const { clave, nrc } = evento.item.dataset;
+        evento.item.remove();
+        if (clave && nrc) alEditar(clave, nrc);
+      },
+    });
+  }
 
   function limpiar() {
     for (const columna of columnas) columna.replaceChildren();
@@ -147,6 +154,7 @@ export function montarCuadricula(contenedor, opciones = {}) {
         columnas[dia].append(crearBloque(sesion));
       }
     });
+
     for (const empalme of opcion.empalmes) {
       columnas[empalme.dia].append(crearEmpalme(empalme));
     }

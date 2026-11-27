@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo: edición manual del horario</title>
+  <link rel="icon" href="data:,">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/modulos/ficha.css" rel="stylesheet">
+  <link href="../css/modulos/listas.css" rel="stylesheet">
+  <link href="../css/modulos/cuadricula.css" rel="stylesheet">
+</head>
+<body class="bg-body-tertiary">
+  <main class="container-fluid py-4">
+    <h1 class="h4 mb-1">Edición manual del horario</h1>
+    <p class="text-secondary">
+      Escenario 1. Arrastra una ficha desde el asa de las listas hasta la cuadrícula: la sección de esa
+      materia se reemplaza en el horario y se vuelve a evaluar. Por ejemplo, suelta
+      <strong>BASES DE DATOS, NRC 100011</strong>: choca con Análisis de Algoritmos el lunes y el
+      miércoles, y el empalme debe verse en rojo. Si sueltas <strong>100012</strong>, vuelve a quedar
+      sin choques.
+    </p>
+
+    <div class="row g-3">
+      <div class="col-lg-8 order-lg-1">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <p id="puntaje" class="small text-secondary mb-0" aria-live="polite"></p>
+          <button id="restablecer" type="button" class="btn btn-sm btn-outline-secondary">Restablecer</button>
+        </div>
+        <p class="small text-secondary mb-2">
+          <i class="bi bi-arrow-down-square"></i> Suelta aquí una ficha de las listas.
+        </p>
+        <div id="cuadricula" class="bg-white border rounded p-2"></div>
+      </div>
+      <div class="col-lg-4 order-lg-2">
+        <div id="listas"></div>
+      </div>
+    </div>
+
+    <p id="aviso" class="text-danger mt-3" role="alert" hidden></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+  <script type="module">
+    import { montarCuadricula } from "../js/vista/cuadricula.js";
+    import { montarListasPrioridad } from "../js/vista/listas.js";
+    import { construirProblema, editarOpcion } from "../js/nucleo/problema.js";
+
+    const textoPuntaje = document.getElementById("puntaje");
+    const textoAviso = document.getElementById("aviso");
+
+    function mostrarAviso(mensaje) {
+      textoAviso.textContent = mensaje;
+      textoAviso.hidden = false;
+    }
+
+    async function leerJSON(ruta) {
+      const respuesta = await fetch(ruta);
+      if (!respuesta.ok) throw new Error(`No se pudo leer ${ruta} (${respuesta.status})`);
+      return respuesta.json();
+    }
+
+    try {
+      const oferta = await leerJSON("../ejemplos/oferta-ejemplo.json");
+      const materias = Array.isArray(oferta) ? oferta : oferta.materias;
+      const preferenciasIniciales = await leerJSON("../ejemplos/escenario-1-preferencias.json");
+      const resultado = await leerJSON("../ejemplos/escenario-1-resultado.json");
+
+      const opcionInicial = (resultado.opciones ?? resultado.esperado?.opciones)[0];
+      let preferencias = structuredClone(preferenciasIniciales);
+      let problema = construirProblema(materias, preferencias);
+      let opcion = opcionInicial;
+
+      function mostrarPuntaje() {
+        const p = opcion.puntaje;
+        textoPuntaje.textContent =
+          `Conflictos: ${p.conflictos} · Costo: ${p.costo} · Huecos: ${p.huecos} min · Empalmes: ${opcion.empalmes.length}`;
+      }
+
+      const cuadricula = montarCuadricula(document.getElementById("cuadricula"), {
+        alEditar: (clave, nrc) => {
+          textoAviso.hidden = true;
+          try {
+            opcion = editarOpcion(opcion, clave, nrc, problema);
+            cuadricula.mostrar(opcion, materias);
+            mostrarPuntaje();
+            console.log("alEditar", clave, nrc, opcion);
+          } catch (error) {
+            mostrarAviso(`No se pudo cambiar la sección: ${error.message}`);
+          }
+        },
+      });
+
+      const listas = montarListasPrioridad(document.getElementById("listas"), {
+        materias,
+        preferencias,
+        descargada: oferta.descargada,
+        alCambiar: (nuevas) => {
+          preferencias = nuevas;
+          problema = construirProblema(materias, preferencias);
+        },
+      });
+
+      document.getElementById("restablecer").addEventListener("click", () => {
+        textoAviso.hidden = true;
+        preferencias = structuredClone(preferenciasIniciales);
+        problema = construirProblema(materias, preferencias);
+        opcion = opcionInicial;
+        listas.actualizar(materias, preferencias, oferta.descargada);
+        cuadricula.mostrar(opcion, materias);
+        mostrarPuntaje();
+      });
+
+      cuadricula.mostrar(opcion, materias);
+      mostrarPuntaje();
+    } catch (error) {
+      mostrarAviso(`No se pudo cargar la demo: ${error.message}`);
+    }
+  </script>
+</body>
+</html>
