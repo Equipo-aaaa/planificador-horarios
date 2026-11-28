@@ -9,14 +9,21 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="css/estilos.css" rel="stylesheet">
   <link href="css/modulos/grafica.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: auto;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 <body>
   <main class="container py-4">
     <a href="index.html" class="small"><i class="bi bi-arrow-left"></i> Volver al planificador</a>
     <h1 class="h3 mt-2">Análisis de los algoritmos</h1>
     <p class="text-secondary">
-      Compara el backtracking con poda contra la búsqueda exhaustiva con problemas aleatorios armados
-      con la oferta real. Cada cantidad de materias se repite varias veces y se grafica el promedio del
+      Compara el backtracking con poda, la búsqueda exhaustiva y la estrategia voraz con problemas
+      aleatorios armados con la oferta real. Cada cantidad de materias se repite varias veces y se grafica el promedio del
       tiempo y de los nodos visitados. Los tiempos dependen de tu computadora; los nodos, no.
     </p>
 
@@ -42,7 +49,7 @@
       </div>
       <p id="ayuda-limite" class="form-text mb-3">
         La exhaustiva solo se mide con ese número de materias o menos, para no congelar la página: sus
-        combinaciones crecen exponencialmente. El backtracking se mide en todo el rango.
+        combinaciones crecen exponencialmente. El backtracking y la voraz se miden en todo el rango.
       </p>
 
       <div class="d-flex flex-wrap align-items-center gap-2">
@@ -60,6 +67,23 @@
     </section>
 
     <div id="grafica"></div>
+
+    <section id="voraz" class="border rounded p-3 mt-3" aria-label="Resultados de la estrategia voraz" hidden>
+      <h2 class="h6">Estrategia voraz</h2>
+      <p id="voraz-resumen" class="mb-2"></p>
+      <p class="small text-secondary">
+        La voraz elige una sección por materia y no regresa a corregir: es muy rápida, pero no siempre
+        da el mejor horario. Se compara contra el backtracking, que da el mismo top 3 que la exhaustiva.
+      </p>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr><th scope="col">Materias</th><th scope="col">Problemas</th><th scope="col">Dio el óptimo</th><th scope="col">Porcentaje</th></tr>
+          </thead>
+          <tbody id="voraz-cuerpo"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>

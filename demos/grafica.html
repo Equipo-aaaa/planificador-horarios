@@ -13,7 +13,7 @@
     <h1 class="h4 mb-1">Gráfica de mediciones</h1>
     <p class="text-secondary">
       Mediciones <strong>inventadas</strong> (no salen de ninguna búsqueda real): sirven para ver
-      que las dos gráficas dibujan una línea por algoritmo. La exhaustiva se detiene en 7 materias
+      que las dos gráficas dibujan una línea por algoritmo (tres: backtracking, exhaustiva y voraz). La exhaustiva se detiene en 7 materias
       a propósito, como pasará en la página de análisis cuando se limite su máximo.
     </p>
 
@@ -42,6 +42,13 @@
             nodos: nodosBT,
             combinaciones: Math.round(3 * 1.6 ** materias * factor),
             ms: nodosBT * 0.0004,
+          });
+          mediciones.push({
+            algoritmo: "voraz",
+            materias,
+            nodos: Math.round(materias * 5 * factor),
+            combinaciones: 1,
+            ms: materias * 0.002 * factor,
           });
           if (materias <= 7) {
             let nodosEx = 0;

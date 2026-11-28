@@ -1,8 +1,8 @@
 import { montarGrafica } from "../vista/grafica.js";
 import { medirProblemas } from "./medir.js";
-
 import { buscarBacktracking } from "../algoritmo/backtracking.js";
 import { buscarExhaustiva } from "../algoritmo/exhaustiva.js";
+import { buscarVoraz } from "../algoritmo/voraz.js";
 import { generarProblemaAleatorio } from "../algoritmo/aleatorio.js";
 
 const CICLO_RESPALDO = "202620";
@@ -21,6 +21,9 @@ const barra = $("progreso-barra");
 const contenedorProgreso = $("progreso");
 const textoEstado = $("estado");
 const textoError = $("error");
+const panelVoraz = $("voraz");
+const textoVoraz = $("voraz-resumen");
+const cuerpoVoraz = $("voraz-cuerpo");
 
 let oferta = [];
 let cancelar = false;
@@ -33,6 +36,37 @@ function mostrarError(mensaje) {
 
 function limpiarError() {
   textoError.hidden = true;
+}
+
+function porcentaje(optimas, problemas) {
+  if (problemas === 0) return "—";
+  return `${Math.round((optimas / problemas) * 100)}%`;
+}
+
+function textoProporcion(optimas, problemas) {
+  if (problemas === 0) return "sin problemas";
+  return `${optimas} de ${problemas} (${porcentaje(optimas, problemas)})`;
+}
+
+function mostrarVoraz(voraz) {
+  if (voraz.problemas === 0) {
+    panelVoraz.hidden = true;
+    return;
+  }
+  textoVoraz.textContent =
+    `La estrategia voraz dio el mismo horario que el backtracking en ${textoProporcion(voraz.optimas, voraz.problemas)} de los problemas.`;
+
+  cuerpoVoraz.replaceChildren();
+  for (const fila of voraz.porMaterias) {
+    const renglon = document.createElement("tr");
+    for (const dato of [fila.materias, fila.problemas, fila.optimas, porcentaje(fila.optimas, fila.problemas)]) {
+      const celda = document.createElement("td");
+      celda.textContent = String(dato);
+      renglon.append(celda);
+    }
+    cuerpoVoraz.append(renglon);
+  }
+  panelVoraz.hidden = false;
 }
 
 function actualizarProgreso(hechos, total) {
@@ -51,6 +85,7 @@ function fijarMedicion(enCurso) {
 
 async function medir() {
   limpiarError();
+  panelVoraz.hidden = true;
   cancelar = false;
   fijarMedicion(true);
   actualizarProgreso(0, 1);
@@ -66,11 +101,13 @@ async function medir() {
       generarProblema: generarProblemaAleatorio,
       buscarBacktracking,
       buscarExhaustiva,
+      buscarVoraz,
       alProgreso: actualizarProgreso,
       cancelado: () => cancelar,
     });
 
     grafica.mostrar(resultado.mediciones);
+    mostrarVoraz(resultado.voraz);
 
     const partes = [`${resultado.mediciones.length} mediciones`];
     if (resultado.omitidasExhaustiva > 0) {
@@ -96,13 +133,12 @@ async function iniciar() {
     const respuesta = await fetch(RUTA_RESPALDO);
     if (!respuesta.ok) throw new Error(`No se pudo leer ${RUTA_RESPALDO} (${respuesta.status})`);
     const datos = await respuesta.json();
-    oferta = datos.materias;
+    oferta = datos.materias.filter((materia) => materia.secciones.length > 0);
 
     campos.maximo.max = String(oferta.length);
     textoEstado.textContent = `Oferta del ciclo ${datos.ciclo}: ${oferta.length} materias (respaldo).`;
     botonMedir.disabled = false;
   } catch (error) {
-    textoEstado.textContent = "";
     mostrarError(`No se pudo preparar la página: ${error.message}`);
   }
 }
