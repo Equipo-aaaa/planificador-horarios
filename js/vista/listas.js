@@ -1,5 +1,6 @@
 import { crearFicha } from "./ficha.js";
 import { descartar, recuperar, alternarFijada } from "./cambios.js";
+import { GRUPO_FICHAS } from "./arrastre.js";
 
 function crear(etiqueta, clase, texto) {
   const elemento = document.createElement(etiqueta);
@@ -12,19 +13,6 @@ const ACCIONES = { fijar: alternarFijada, descartar, recuperar };
 
 const FOCO_SIGUIENTE = { fijar: "fijar", descartar: "recuperar", recuperar: "fijar" };
 
-/**
- * Dibuja una lista por materia con sus fichas, que se reordenan arrastrando y se
- * pueden fijar o descartar, y una zona de descartadas desde donde se recuperan.
- *
- * @param {HTMLElement} contenedor  Elemento donde se dibuja; no se toca nada fuera de él.
- * @param {Object} opciones
- *   - materias:     Materia[] de las materias agregadas
- *   - preferencias: Preferencias (contrato) con el orden de cada materia
- *   - descargada:   fecha ISO de la oferta, para el cupo de cada ficha
- *   - alCambiar(preferenciasNuevas): se llama cada vez que el estudiante reordena,
- *                   descarta, recupera o fija; recibe las Preferencias COMPLETAS ya modificadas
- * @returns {{ actualizar(materias, preferencias, descargada): void }}
- */
 export function montarListasPrioridad(contenedor, opciones) {
   const { alCambiar } = opciones;
 
@@ -58,11 +46,12 @@ export function montarListasPrioridad(contenedor, opciones) {
   function crearItem(seccion, materia, preferencia) {
     const item = crear("div", "lista__item");
     item.dataset.nrc = seccion.nrc;
+    item.dataset.clave = materia.clave;
 
     const asa = crear("span", "lista__asa");
     asa.setAttribute("role", "img");
-    asa.setAttribute("aria-label", "Arrastrar para reordenar");
-    asa.title = "Arrastrar para reordenar";
+    asa.setAttribute("aria-label", "Arrastrar para reordenar o soltar en el horario");
+    asa.title = "Arrastrar para reordenar o soltar en el horario";
     asa.append(crear("i", "bi bi-grip-vertical"));
 
     const fijada = preferencia.fijada === seccion.nrc;
@@ -162,10 +151,16 @@ export function montarListasPrioridad(contenedor, opciones) {
 
       const ordenable = Sortable.create(fichas, {
         animation: 150,
+        group: { name: GRUPO_FICHAS, pull: "clone", put: false },
         handle: ".lista__asa",
         draggable: ".lista__item",
         dataIdAttr: "data-nrc",
+        scroll: true,
+        scrollSensitivity: 80,
+        scrollSpeed: 18,
+        bubbleScroll: true,
         onEnd: (evento) => {
+          if (evento.from !== evento.to) return;
           if (evento.oldIndex === evento.newIndex) return;
           alReordenar(materia.clave, ordenable.toArray());
         },

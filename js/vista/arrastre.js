@@ -1,0 +1,1 @@
+export const GRUPO_FICHAS = "fichas";
