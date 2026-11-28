@@ -4,6 +4,15 @@ export function estimarCombinaciones(problema) {
   return problema.materias.reduce((producto, materia) => producto * materia.candidatas.length, 1);
 }
 
+export function mismoHorario(resultadoA, resultadoB) {
+  const a = resultadoA.opciones[0];
+  const b = resultadoB.opciones[0];
+  if (!a || !b) return false;
+  if (a.secciones.length !== b.secciones.length) return false;
+  const nrcPorClave = new Map(b.secciones.map((seccion) => [seccion.clave, seccion.nrc]));
+  return a.secciones.every((seccion) => nrcPorClave.get(seccion.clave) === seccion.nrc);
+}
+
 const cederTurnoPorDefecto = () => new Promise((resolver) => setTimeout(resolver, 0));
 
 function aMedicion(algoritmo, materias, resultado) {
@@ -22,6 +31,7 @@ export async function medirProblemas(config) {
     generarProblema,
     buscarBacktracking,
     buscarExhaustiva,
+    buscarVoraz,
     alProgreso = () => {},
     cancelado = () => false,
     cederTurno = cederTurnoPorDefecto,
@@ -35,22 +45,49 @@ export async function medirProblemas(config) {
     throw new Error(`La oferta solo tiene ${oferta.length} materias; baja el máximo`);
   }
   if (repeticiones < 1) throw new Error("Las repeticiones deben ser al menos 1");
+  if (typeof buscarVoraz !== "function") throw new Error("Falta la función buscarVoraz");
 
   const mediciones = [];
   let omitidasExhaustiva = 0;
   const total = (maxMaterias - minMaterias + 1) * repeticiones;
   let hechos = 0;
 
+  const vorazPorMaterias = new Map();
+  let vorazProblemas = 0;
+  let vorazOptimas = 0;
+
+  const resultado = (esCancelado) => ({
+    mediciones,
+    omitidasExhaustiva,
+    total,
+    cancelado: esCancelado,
+    voraz: {
+      problemas: vorazProblemas,
+      optimas: vorazOptimas,
+      porMaterias: [...vorazPorMaterias.values()].sort((a, b) => a.materias - b.materias),
+    },
+  });
+
   for (let materias = minMaterias; materias <= maxMaterias; materias++) {
     for (let repeticion = 0; repeticion < repeticiones; repeticion++) {
-      if (cancelado()) return { mediciones, omitidasExhaustiva, total, cancelado: true };
+      if (cancelado()) return resultado(true);
 
       const problema = generarProblema(materias, oferta, materias * 1000 + repeticion);
 
-      mediciones.push(aMedicion("backtracking", materias, buscarBacktracking(problema)));
+      const deBacktracking = buscarBacktracking(problema);
+      mediciones.push(aMedicion("backtracking", materias, deBacktracking));
 
-      // En AN-09 se agrega aquí la llamada a la estrategia voraz con la misma
-      // clave que se defina en ALGORITMOS de js/vista/grafica.js.
+      const deVoraz = buscarVoraz(problema);
+      mediciones.push(aMedicion("voraz", materias, deVoraz));
+
+      const grupo = vorazPorMaterias.get(materias) ?? { materias, problemas: 0, optimas: 0 };
+      grupo.problemas += 1;
+      vorazProblemas += 1;
+      if (mismoHorario(deVoraz, deBacktracking)) {
+        grupo.optimas += 1;
+        vorazOptimas += 1;
+      }
+      vorazPorMaterias.set(materias, grupo);
 
       const cabe = materias <= maxMateriasExhaustiva && estimarCombinaciones(problema) <= maxCombinaciones;
       if (cabe) {
@@ -65,5 +102,5 @@ export async function medirProblemas(config) {
     }
   }
 
-  return { mediciones, omitidasExhaustiva, total, cancelado: false };
+  return resultado(false);
 }

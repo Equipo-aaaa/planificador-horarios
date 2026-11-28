@@ -1,9 +1,7 @@
-// La clave es el valor del campo "algoritmo" de las mediciones. En AN-09, la
-// estrategia voraz se agrega aquí con una línea más (con la misma clave que use
-// la página de análisis en sus mediciones); el resto del módulo no cambia.
 const ALGORITMOS = {
   backtracking: { nombre: "Backtracking con poda", color: "#2f6fed", punto: "circle", trazo: [] },
   exhaustiva: { nombre: "Búsqueda exhaustiva", color: "#d9480f", punto: "rectRot", trazo: [6, 4] },
+  voraz: { nombre: "Estrategia voraz", color: "#2b8a3e", punto: "triangle", trazo: [2, 3] },
 };
 
 function crear(etiqueta, clase, texto) {
@@ -142,6 +140,7 @@ export function montarGrafica(contenedor) {
 
   function mostrar(mediciones) {
     const hayDatos = mediciones.length > 0;
+
     if (!hayDatos) {
       destruir();
       ultimas = [];
